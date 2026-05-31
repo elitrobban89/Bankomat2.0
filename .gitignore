@@ -1,7 +1,13 @@
+### Java ###
+*.class
+*.jar
+!lib/*.jar
+!min_labb3.jar
+
 ### IntelliJ IDEA ###
+.idea/
+*.iml
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 .kotlin
 
 ### Eclipse ###
