@@ -31,50 +31,42 @@ public class BankRepository {
         String sql = "SELECT 1 FROM person WHERE name = ?";
         try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, name);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
     public boolean accountExists(String kontonr) {
         String sql = "SELECT 1 FROM konto WHERE kontonr = ?";
         try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, kontonr);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+    }
+
+    public boolean personHasAccounts(String name) {
+        String sql = "SELECT 1 FROM konto WHERE namn = ?";
+        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
     public void insertPerson(String name, String gatuadress, String postnr, String stad) {
         String sql = "INSERT INTO person (name, gatuadress, postnr, stad) VALUES (?, ?, ?, ?)";
         try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, name);
-            ps.setString(2, gatuadress);
-            ps.setString(3, postnr);
-            ps.setString(4, stad);
+            ps.setString(1, name); ps.setString(2, gatuadress);
+            ps.setString(3, postnr); ps.setString(4, stad);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
     public void insertAccount(String kontonr, String kontotyp, String namn, double saldo) {
         String sql = "INSERT INTO konto (kontonr, kontotyp, namn, saldo) VALUES (?, ?, ?, ?)";
         try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, kontonr);
-            ps.setString(2, kontotyp);
-            ps.setString(3, namn);
-            ps.setDouble(4, saldo);
+            ps.setString(1, kontonr); ps.setString(2, kontotyp);
+            ps.setString(3, namn); ps.setDouble(4, saldo);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
     public double getSaldo(String kontonr) {
@@ -85,33 +77,53 @@ public class BankRepository {
                 if (rs.next()) return rs.getDouble(1);
                 throw new BankException("Kontonummer finns inte!");
             }
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
     public void updateSaldo(String kontonr, double saldo) {
         String sql = "UPDATE konto SET saldo = ? WHERE kontonr = ?";
         try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setDouble(1, saldo);
-            ps.setString(2, kontonr);
+            ps.setDouble(1, saldo); ps.setString(2, kontonr);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
     public void insertTransaction(String kontonr, String typ, double belopp, String ocr) {
         String sql = "INSERT INTO gjordatrans (kontonr, typ, belopp, OCRmeddelande) VALUES (?, ?, ?, ?)";
         try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, kontonr);
-            ps.setString(2, typ);
-            ps.setDouble(3, belopp);
-            ps.setString(4, ocr);
+            ps.setString(1, kontonr); ps.setString(2, typ);
+            ps.setDouble(3, belopp); ps.setString(4, ocr);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+    }
+
+    public void deleteAccount(String kontonr) {
+        try (Connection c = connect()) {
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM gjordatrans WHERE kontonr = ?")) {
+                ps.setString(1, kontonr); ps.executeUpdate();
+            }
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM konto WHERE kontonr = ?")) {
+                ps.setString(1, kontonr); ps.executeUpdate();
+            }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+    }
+
+    public void deletePerson(String name) {
+        String sql = "DELETE FROM person WHERE name = ?";
+        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, name); ps.executeUpdate();
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+    }
+
+    public List<String> getAllPersonNames() {
+        String sql = "SELECT name FROM person ORDER BY name";
+        List<String> result = new ArrayList<>();
+        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) result.add(rs.getString(1));
+            }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+        return result;
     }
 
     public List<String> getKontoInfo(String kontonr) {
@@ -121,34 +133,29 @@ public class BankRepository {
             ps.setString(1, kontonr);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    result.add("Kontonr: " + rs.getString(1)
-                            + ", Typ: " + rs.getString(2)
-                            + ", Namn: " + rs.getString(3)
-                            + ", Saldo: " + rs.getString(4));
+                    String typ = "spar".equals(rs.getString(2)) ? "Sparkonto" : "Lönekonto";
+                    result.add(String.format(
+                        "Kontonummer:  %s%nTyp:          %s%nÄgare:        %s%nSaldo:        %.2f kr",
+                        rs.getString(1), typ, rs.getString(3), rs.getDouble(4)));
                 }
             }
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
         return result;
     }
 
     public List<String> getTransactions(String kontonr) {
-        String sql = "SELECT kontonr, typ, belopp, OCRmeddelande FROM gjordatrans WHERE kontonr = ?";
+        String sql = "SELECT typ, belopp, OCRmeddelande FROM gjordatrans WHERE kontonr = ?";
         List<String> result = new ArrayList<>();
         try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, kontonr);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    result.add("Kontonr: " + rs.getString(1)
-                            + ", Typ: " + rs.getString(2)
-                            + ", Belopp: " + rs.getString(3)
-                            + ", OCR: " + rs.getString(4));
+                    String typ = "ins".equals(rs.getString(1)) ? "Insättning" : "Uttag     ";
+                    result.add(String.format("%-10s  %9.2f kr  –  %s",
+                        typ, rs.getDouble(2), rs.getString(3)));
                 }
             }
-        } catch (SQLException e) {
-            throw new BankException("Databasfel: " + e.getMessage());
-        }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
         return result;
     }
 }

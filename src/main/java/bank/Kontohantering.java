@@ -11,14 +11,14 @@ public class Kontohantering extends JFrame {
     private final Meny meny;
     private JTextField txtKonto;
     private JTextArea infoArea;
-    private JButton btnInsattning, btnUttag, btnOverforing, btnTransaktioner;
+    private JButton btnInsattning, btnUttag, btnOverforing, btnTransaktioner, btnTaBort;
     private String aktivtKonto;
 
     public Kontohantering(BankService bankService, Meny meny) {
         this.bankService = bankService;
         this.meny        = meny;
         setTitle("Kontohantering");
-        setSize(480, 520);
+        setSize(480, 560);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -36,31 +36,32 @@ public class Kontohantering extends JFrame {
 
         JPanel card = UITheme.cardPanel(new GridBagLayout());
 
+        // --- Sökrad ---
         GridBagConstraints lc = new GridBagConstraints();
         lc.anchor = GridBagConstraints.WEST;
         lc.insets = new Insets(0, 0, 14, 14);
-        lc.gridx  = 0; lc.gridy = 0;
+        lc.gridx = 0; lc.gridy = 0;
 
         GridBagConstraints fc = new GridBagConstraints();
-        fc.fill    = GridBagConstraints.HORIZONTAL;
+        fc.fill = GridBagConstraints.HORIZONTAL;
         fc.weightx = 1.0;
-        fc.insets  = new Insets(0, 0, 14, 0);
-        fc.gridx   = 1; fc.gridy = 0;
+        fc.insets = new Insets(0, 0, 14, 0);
+        fc.gridx = 1; fc.gridy = 0;
 
         card.add(UITheme.label("Kontonummer:"), lc);
         txtKonto = UITheme.textField();
         card.add(txtKonto, fc);
 
-        JButton btnSök = UITheme.primaryButton("Sök");
-        btnSök.addActionListener(this::sökKonto);
-
         GridBagConstraints bc = new GridBagConstraints();
         bc.gridx = 0; bc.gridy = 1; bc.gridwidth = 2;
-        bc.fill  = GridBagConstraints.HORIZONTAL;
-        bc.insets = new Insets(0, 0, 16, 0);
+        bc.fill = GridBagConstraints.HORIZONTAL;
+        bc.insets = new Insets(0, 0, 14, 0);
+        JButton btnSök = UITheme.primaryButton("Sök");
+        btnSök.addActionListener(this::sökKonto);
         card.add(btnSök, bc);
 
-        infoArea = new JTextArea(4, 20);
+        // --- Infoarea ---
+        infoArea = new JTextArea(5, 20);
         infoArea.setEditable(false);
         infoArea.setFont(new Font("Arial", Font.PLAIN, 13));
         infoArea.setBackground(new Color(245, 247, 250));
@@ -71,52 +72,67 @@ public class Kontohantering extends JFrame {
 
         GridBagConstraints ac = new GridBagConstraints();
         ac.gridx = 0; ac.gridy = 2; ac.gridwidth = 2;
-        ac.fill  = GridBagConstraints.BOTH;
+        ac.fill = GridBagConstraints.BOTH;
         ac.weightx = 1.0; ac.weighty = 1.0;
-        ac.insets = new Insets(0, 0, 16, 0);
+        ac.insets = new Insets(0, 0, 14, 0);
         card.add(infoArea, ac);
 
-        GridBagConstraints t1c = new GridBagConstraints();
-        t1c.gridx = 0; t1c.gridy = 3; t1c.gridwidth = 2;
-        t1c.fill  = GridBagConstraints.HORIZONTAL;
-        t1c.insets = new Insets(0, 0, 8, 0);
+        // --- Transaktionsknappar ---
+        GridBagConstraints r3 = new GridBagConstraints();
+        r3.gridx = 0; r3.gridy = 3; r3.gridwidth = 2;
+        r3.fill = GridBagConstraints.HORIZONTAL;
+        r3.insets = new Insets(0, 0, 8, 0);
 
         JPanel transRow = new JPanel(new GridLayout(1, 3, 8, 0));
         transRow.setBackground(UITheme.CARD);
-        btnInsattning  = UITheme.primaryButton("Insättning");
-        btnUttag       = UITheme.primaryButton("Uttag");
-        btnOverforing  = UITheme.primaryButton("Överföring");
-        btnInsattning.setEnabled(false);
-        btnUttag.setEnabled(false);
-        btnOverforing.setEnabled(false);
-        btnInsattning.addActionListener(e -> new TransaktionDialog(this, bankService, aktivtKonto, TransaktionDialog.Typ.INSATTNING).setVisible(true));
-        btnUttag.addActionListener(e -> new TransaktionDialog(this, bankService, aktivtKonto, TransaktionDialog.Typ.UTTAG).setVisible(true));
-        btnOverforing.addActionListener(e -> new TransaktionDialog(this, bankService, aktivtKonto, TransaktionDialog.Typ.OVERFORING).setVisible(true));
+        btnInsattning = UITheme.primaryButton("Insättning");
+        btnUttag      = UITheme.primaryButton("Uttag");
+        btnOverforing = UITheme.primaryButton("Överföring");
         transRow.add(btnInsattning);
         transRow.add(btnUttag);
         transRow.add(btnOverforing);
-        card.add(transRow, t1c);
+        card.add(transRow, r3);
 
-        GridBagConstraints t2c = new GridBagConstraints();
-        t2c.gridx = 0; t2c.gridy = 4; t2c.gridwidth = 2;
-        t2c.fill  = GridBagConstraints.HORIZONTAL;
-        t2c.insets = new Insets(0, 0, 8, 0);
+        btnInsattning.addActionListener(e -> {
+            new TransaktionDialog(this, bankService, aktivtKonto, TransaktionDialog.Typ.INSATTNING).setVisible(true);
+            refreshKonto();
+        });
+        btnUttag.addActionListener(e -> {
+            new TransaktionDialog(this, bankService, aktivtKonto, TransaktionDialog.Typ.UTTAG).setVisible(true);
+            refreshKonto();
+        });
+        btnOverforing.addActionListener(e -> {
+            new TransaktionDialog(this, bankService, aktivtKonto, TransaktionDialog.Typ.OVERFORING).setVisible(true);
+            refreshKonto();
+        });
 
+        // --- Sekundärknappar ---
+        GridBagConstraints r4 = new GridBagConstraints();
+        r4.gridx = 0; r4.gridy = 4; r4.gridwidth = 2;
+        r4.fill = GridBagConstraints.HORIZONTAL;
+        r4.insets = new Insets(0, 0, 8, 0);
+
+        JPanel sekundärRow = new JPanel(new GridLayout(1, 2, 8, 0));
+        sekundärRow.setBackground(UITheme.CARD);
         btnTransaktioner = UITheme.secondaryButton("Visa transaktioner");
-        btnTransaktioner.setEnabled(false);
-        btnTransaktioner.addActionListener(e -> visaTransaktioner());
-        card.add(btnTransaktioner, t2c);
+        btnTaBort        = UITheme.secondaryButton("Ta bort konto");
+        sekundärRow.add(btnTransaktioner);
+        sekundärRow.add(btnTaBort);
+        card.add(sekundärRow, r4);
 
-        GridBagConstraints backC = new GridBagConstraints();
-        backC.gridx = 0; backC.gridy = 5; backC.gridwidth = 2;
-        backC.fill  = GridBagConstraints.HORIZONTAL;
+        btnTransaktioner.addActionListener(e -> visaTransaktioner());
+        btnTaBort.addActionListener(e -> taBortKonto());
+
+        // --- Tillbaka ---
+        GridBagConstraints r5 = new GridBagConstraints();
+        r5.gridx = 0; r5.gridy = 5; r5.gridwidth = 2;
+        r5.fill = GridBagConstraints.HORIZONTAL;
 
         JButton btnTillbaka = UITheme.secondaryButton("Tillbaka");
-        btnTillbaka.addActionListener(e -> {
-            this.setVisible(false);
-            meny.setVisible(true);
-        });
-        card.add(btnTillbaka, backC);
+        btnTillbaka.addActionListener(e -> { this.setVisible(false); meny.setVisible(true); });
+        card.add(btnTillbaka, r5);
+
+        setTransactionButtonsEnabled(false);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -133,27 +149,70 @@ public class Kontohantering extends JFrame {
             List<String> kontoInfo = bankService.getKontoInfo(kontonr);
             infoArea.setText(String.join("\n", kontoInfo));
             aktivtKonto = kontonr;
-            btnInsattning.setEnabled(true);
-            btnUttag.setEnabled(true);
-            btnOverforing.setEnabled(true);
-            btnTransaktioner.setEnabled(true);
+            setTransactionButtonsEnabled(true);
         } catch (BankException e) {
             infoArea.setText("");
             aktivtKonto = null;
-            btnInsattning.setEnabled(false);
-            btnUttag.setEnabled(false);
-            btnOverforing.setEnabled(false);
-            btnTransaktioner.setEnabled(false);
+            setTransactionButtonsEnabled(false);
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
 
+    private void refreshKonto() {
+        if (aktivtKonto == null) return;
+        try {
+            List<String> kontoInfo = bankService.getKontoInfo(aktivtKonto);
+            infoArea.setText(String.join("\n", kontoInfo));
+        } catch (BankException ignored) {}
+    }
+
     private void visaTransaktioner() {
         List<String> trans = bankService.getTransactions(aktivtKonto);
-        if (trans.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Inga transaktioner hittades.");
-        } else {
-            JOptionPane.showMessageDialog(this, "Transaktioner:\n" + String.join("\n", trans));
+
+        JDialog dialog = new JDialog(this, "Transaktioner – konto " + aktivtKonto, true);
+        dialog.setSize(520, 380);
+        dialog.setLocationRelativeTo(this);
+
+        JTextArea area = new JTextArea();
+        area.setEditable(false);
+        area.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        area.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
+        area.setText(trans.isEmpty() ? "Inga transaktioner hittades." : String.join("\n", trans));
+
+        JButton btnStäng = UITheme.secondaryButton("Stäng");
+        btnStäng.addActionListener(e -> dialog.dispose());
+        JPanel btnPanel = new JPanel();
+        btnPanel.setBackground(UITheme.BG);
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 14, 0));
+        btnPanel.add(btnStäng);
+
+        dialog.add(new JScrollPane(area), BorderLayout.CENTER);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+        dialog.setVisible(true);
+    }
+
+    private void taBortKonto() {
+        int svar = JOptionPane.showConfirmDialog(this,
+            "Vill du ta bort konto " + aktivtKonto + "?\nAlla transaktioner för kontot tas också bort.",
+            "Bekräfta borttagning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (svar == JOptionPane.YES_OPTION) {
+            try {
+                bankService.deleteAccount(aktivtKonto);
+                infoArea.setText("");
+                aktivtKonto = null;
+                setTransactionButtonsEnabled(false);
+                JOptionPane.showMessageDialog(this, "Kontot har tagits bort.");
+            } catch (BankException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage());
+            }
         }
+    }
+
+    private void setTransactionButtonsEnabled(boolean enabled) {
+        btnInsattning.setEnabled(enabled);
+        btnUttag.setEnabled(enabled);
+        btnOverforing.setEnabled(enabled);
+        btnTransaktioner.setEnabled(enabled);
+        btnTaBort.setEnabled(enabled);
     }
 }

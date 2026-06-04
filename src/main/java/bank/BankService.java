@@ -89,6 +89,22 @@ public class BankService {
         return repo.getTransactions(kontonr);
     }
 
+    public List<String> getAllPersonNames() {
+        return repo.getAllPersonNames();
+    }
+
+    public void deletePerson(String name) {
+        if (repo.personHasAccounts(name))
+            throw new BankException("Kontoinnehavaren har aktiva konton — ta bort dessa först");
+        repo.deletePerson(name);
+    }
+
+    public void deleteAccount(String kontonr) {
+        if (!repo.accountExists(kontonr))
+            throw new BankException("Kontot finns inte");
+        repo.deleteAccount(kontonr);
+    }
+
     private void validateAccountNumber(String kontonr) {
         if (kontonr == null || kontonr.length() < 5 || !kontonr.chars().allMatch(Character::isDigit))
             throw new BankException("Felaktigt kontonr, försök igen (minst 5 siffror)");

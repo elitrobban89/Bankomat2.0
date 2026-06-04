@@ -10,13 +10,14 @@ public class Val extends JFrame implements ActionListener {
     private final Meny meny;
     private JButton btnNyKontoinnehavare;
     private JButton btnNyttKonto;
+    private JButton btnVisaPersoner;
     private JButton btnTillbaka;
 
     public Val(BankService bankService, Meny meny) {
         this.bankService = bankService;
         this.meny        = meny;
         setTitle("Registervård");
-        setSize(400, 380);
+        setSize(400, 420);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -32,18 +33,23 @@ public class Val extends JFrame implements ActionListener {
         center.setBackground(UITheme.BG);
         center.setBorder(BorderFactory.createEmptyBorder(24, 32, 24, 32));
 
-        JPanel card = UITheme.cardPanel(new GridLayout(3, 1, 0, 12));
+        JPanel card = UITheme.cardPanel(new GridLayout(4, 1, 0, 12));
         btnNyKontoinnehavare = UITheme.primaryButton("Ny kontoinnehavare");
         btnNyttKonto         = UITheme.primaryButton("Nytt konto");
+        btnVisaPersoner      = UITheme.secondaryButton("Visa kontoinnehavare");
         btnTillbaka          = UITheme.secondaryButton("Tillbaka");
+
         btnNyKontoinnehavare.addActionListener(this);
         btnNyttKonto.addActionListener(this);
+        btnVisaPersoner.addActionListener(this);
         btnTillbaka.addActionListener(e -> {
             this.setVisible(false);
             meny.setVisible(true);
         });
+
         card.add(btnNyKontoinnehavare);
         card.add(btnNyttKonto);
+        card.add(btnVisaPersoner);
         card.add(btnTillbaka);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -61,6 +67,8 @@ public class Val extends JFrame implements ActionListener {
             new NyPersonForm(bankService).setVisible(true);
         } else if (e.getSource() == btnNyttKonto) {
             new NyttKontoForm(bankService).setVisible(true);
+        } else if (e.getSource() == btnVisaPersoner) {
+            new PersonListDialog(this, bankService).setVisible(true);
         }
     }
 }
