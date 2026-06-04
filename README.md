@@ -4,11 +4,20 @@ Ett internt bankhanteringssystem byggt med Java Swing och SQLite. Applikationen 
 
 ## Funktioner
 
-- Skapa nya kontoinnehavare
+**Registervård**
+- Registrera nya kontoinnehavare
 - Skapa nya konton (sparkonto eller lönekonto)
-- Sätta in och ta ut pengar
+- Visa lista över alla kontoinnehavare
+- Ta bort kontoinnehavare (kräver att inga aktiva konton finns)
+
+**Kontohantering**
+- Söka upp konto med kontonummer
+- Sätta in pengar
+- Ta ut pengar
 - Överföra pengar mellan konton
-- Söka upp kontoinformation och transaktionshistorik
+- Visa scrollbar transaktionshistorik
+- Saldo uppdateras automatiskt efter varje transaktion
+- Ta bort konto (alla tillhörande transaktioner tas också bort)
 
 ## Teknisk stack
 
@@ -24,7 +33,8 @@ Ett internt bankhanteringssystem byggt med Java Swing och SQLite. Applikationen 
 Projektet är uppdelat i tre lager:
 
 ```
-UI-lager          Meny, Val, Kontohantering, NyPersonForm, NyttKontoForm, TransaktionDialog
+UI-lager          Meny, Val, Kontohantering, NyPersonForm, NyttKontoForm,
+                  TransaktionDialog, PersonListDialog
     ↓
 Servicelager      BankService — affärslogik och validering
     ↓
@@ -34,21 +44,13 @@ Datalager         BankRepository — SQL-frågor med PreparedStatement
 - **UI-lagret** hanterar endast grafik och visar felmeddelanden via `JOptionPane`
 - **BankService** validerar indata och kastar `BankException` med användarvänliga felmeddelanden
 - **BankRepository** sköter all databaskommunikation med parametriserade frågor (skyddar mot SQL injection)
+- Databasen skapas automatiskt om den inte finns
 
 ## Kom igång
 
 ### Krav
 
 - Java 8 eller senare
-- `lib/sqlite-jdbc-3.7.15-M1.jar` (ingår i repot)
-- Databasfilen `werasbetal.db` (ingår i repot)
-
-### Kompilera och kör
-
-```bash
-javac -cp "lib/sqlite-jdbc-3.7.15-M1.jar" -d out/production/min_labb3 src/main/java/bank/*.java
-java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.7.15-M1.jar" bank.Meny
-```
 
 ### Kör med JAR (enklaste sättet)
 
@@ -56,6 +58,13 @@ JAR-filen innehåller allt — ingen separat JDBC-driver behövs:
 
 ```bash
 java -jar min_labb3.jar
+```
+
+### Kompilera och kör från källkod
+
+```bash
+javac -cp "lib/sqlite-jdbc-3.7.15-M1.jar" -d out/production/min_labb3 src/main/java/bank/*.java
+java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.7.15-M1.jar" bank.Meny
 ```
 
 ## Projektstruktur
@@ -68,19 +77,18 @@ min_labb3/
 │           └── bank/
 │               ├── Meny.java              # Startpunkt — huvudmeny
 │               ├── Val.java               # Undermeny för registervård
-│               ├── Kontohantering.java    # Kontosökning
+│               ├── Kontohantering.java    # Kontosökning och transaktioner
 │               ├── NyPersonForm.java      # Formulär för ny kontoinnehavare
 │               ├── NyttKontoForm.java     # Formulär för nytt konto
 │               ├── TransaktionDialog.java # Dialog för insättning, uttag och överföring
+│               ├── PersonListDialog.java  # Lista och ta bort kontoinnehavare
 │               ├── UITheme.java           # Gemensam styling (färger, knappar, kort)
 │               ├── BankService.java       # Affärslogik och validering
 │               ├── BankRepository.java    # Databasåtkomst
 │               └── BankException.java     # Felhantering mellan lagren
 ├── lib/
 │   └── sqlite-jdbc-3.7.15-M1.jar         # SQLite JDBC-driver
-├── out/
-│   └── production/min_labb3/             # Kompilerade .class-filer
-├── werasbetal.db                          # SQLite-databas
+├── min_labb3.jar                          # Körbar JAR (inkluderar allt)
 ├── werasbetal.sql                         # Databasschema och testdata
 └── README.md
 ```
@@ -91,3 +99,4 @@ min_labb3/
 - Kontotyp måste vara `spar` eller `loen`
 - Maxbelopp per transaktion: 20 000 kr
 - Kontoinnehavaren måste finnas registrerad innan ett konto skapas
+- En kontoinnehavare kan inte tas bort om aktiva konton finns
