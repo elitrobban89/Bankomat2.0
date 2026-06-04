@@ -6,7 +6,7 @@ import java.util.List;
 
 public class BankRepository {
 
-    private static final String DB_URL = "jdbc:sqlite:C:/Users/robba/Desktop/min_labb3/werasbetal.db";
+    private static final String DB_URL = "jdbc:sqlite:werasbetal.db";
 
     static {
         try {
