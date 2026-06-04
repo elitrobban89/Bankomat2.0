@@ -50,7 +50,9 @@ javac -cp "lib/sqlite-jdbc-3.7.15-M1.jar" -d out/production/min_labb3 src/main/j
 java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.7.15-M1.jar" bank.Meny
 ```
 
-### Kör med JAR
+### Kör med JAR (enklaste sättet)
+
+JAR-filen innehåller allt — ingen separat JDBC-driver behövs:
 
 ```bash
 java -jar min_labb3.jar
