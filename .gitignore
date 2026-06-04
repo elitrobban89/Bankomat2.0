@@ -1,5 +1,6 @@
 ### Java ###
 *.class
+*.db
 *.jar
 !lib/*.jar
 !min_labb3.jar
