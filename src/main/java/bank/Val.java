@@ -6,20 +6,21 @@ import java.awt.event.*;
 
 public class Val extends JFrame implements ActionListener {
 
+    private final BankService bankService;
+    private final Meny meny;
     private JButton btnNyKontoinnehavare;
     private JButton btnNyttKonto;
     private JButton btnTillbaka;
-    private Meny meny;
 
-    public Val(Meny meny) {
-        this.meny = meny;
+    public Val(BankService bankService, Meny meny) {
+        this.bankService = bankService;
+        this.meny        = meny;
         setTitle("Registervård");
         setSize(400, 380);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
         setupGUI();
-        setVisible(true);
     }
 
     private void setupGUI() {
@@ -57,11 +58,9 @@ public class Val extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnNyKontoinnehavare) {
-            new NewJFrame3().setVisible(true);
-            this.setVisible(false);
-        }
-        if (e.getSource() == btnNyttKonto) {
-            JOptionPane.showMessageDialog(this, "Skapar nytt konto...");
+            new NyPersonForm(bankService).setVisible(true);
+        } else if (e.getSource() == btnNyttKonto) {
+            new NyttKontoForm(bankService).setVisible(true);
         }
     }
 }

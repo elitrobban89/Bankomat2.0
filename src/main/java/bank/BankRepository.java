@@ -11,8 +11,15 @@ public class BankRepository {
     static {
         try {
             Class.forName("org.sqlite.JDBC");
+            try (Connection c = DriverManager.getConnection(DB_URL); Statement st = c.createStatement()) {
+                st.execute("CREATE TABLE IF NOT EXISTS person (name VARCHAR(50), gatuadress VARCHAR(50), postnr CHAR(5), stad VARCHAR(50))");
+                st.execute("CREATE TABLE IF NOT EXISTS konto (kontonr CHAR(13), kontotyp VARCHAR(10), namn VARCHAR(50), saldo DOUBLE)");
+                st.execute("CREATE TABLE IF NOT EXISTS gjordatrans (kontonr CHAR(13), typ CHAR(3), belopp DOUBLE, OCRmeddelande VARCHAR(70))");
+            }
         } catch (ClassNotFoundException e) {
             throw new ExceptionInInitializerError("SQLite JDBC driver not found: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new ExceptionInInitializerError("Kunde inte initiera databasen: " + e.getMessage());
         }
     }
 

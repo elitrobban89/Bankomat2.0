@@ -6,6 +6,7 @@ import java.awt.event.*;
 
 public class Meny extends JFrame implements ActionListener {
 
+    private final BankService bankService = new BankService();
     private JButton btnRegister;
     private JButton btnAccount;
 
@@ -48,10 +49,10 @@ public class Meny extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnRegister) {
-            new Val(this).setVisible(true);
+            new Val(bankService, this).setVisible(true);
             this.setVisible(false);
         } else if (e.getSource() == btnAccount) {
-            new Kontohantering(this).setVisible(true);
+            new Kontohantering(bankService, this).setVisible(true);
             this.setVisible(false);
         }
     }
