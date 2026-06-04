@@ -18,7 +18,7 @@ public class TransaktionDialog extends JDialog {
         this.bankService = bankService;
         this.kontonr     = kontonr;
         this.typ         = typ;
-        setSize(400, typ == Typ.OVERFORING ? 380 : 320);
+        setSize(440, typ == Typ.OVERFORING ? 460 : 400);
         setLocationRelativeTo(parent);
         setResizable(false);
         initComponents();
