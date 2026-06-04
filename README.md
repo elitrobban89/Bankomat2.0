@@ -59,15 +59,26 @@ java -jar min_labb3.jar
 ## Projektstruktur
 
 ```
-src/main/java/bank/
-├── Meny.java              # Startpunkt — huvudmeny
-├── Val.java               # Undermeny för registervård
-├── Kontohantering.java    # Kontosökning
-├── NewJFrame3.java        # Formulär för nytt konto
-├── UITheme.java           # Gemensam styling (färger, knappar, kort)
-├── BankService.java       # Affärslogik och validering
-├── BankRepository.java    # Databasåtkomst
-└── BankException.java     # Felhantering mellan lagren
+min_labb3/
+├── src/
+│   └── main/
+│       └── java/
+│           └── bank/
+│               ├── Meny.java              # Startpunkt — huvudmeny
+│               ├── Val.java               # Undermeny för registervård
+│               ├── Kontohantering.java    # Kontosökning
+│               ├── NewJFrame3.java        # Formulär för nytt konto
+│               ├── UITheme.java           # Gemensam styling (färger, knappar, kort)
+│               ├── BankService.java       # Affärslogik och validering
+│               ├── BankRepository.java    # Databasåtkomst
+│               └── BankException.java     # Felhantering mellan lagren
+├── lib/
+│   └── sqlite-jdbc-3.7.15-M1.jar         # SQLite JDBC-driver
+├── out/
+│   └── production/min_labb3/             # Kompilerade .class-filer
+├── werasbetal.db                          # SQLite-databas
+├── werasbetal.sql                         # Databasschema och testdata
+└── README.md
 ```
 
 ## Regler och begränsningar
