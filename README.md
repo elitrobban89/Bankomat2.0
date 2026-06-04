@@ -46,8 +46,8 @@ Datalager         BankRepository — SQL-frågor med PreparedStatement
 ### Kompilera och kör
 
 ```bash
-javac -cp "lib/sqlite-jdbc-3.7.15-M1.jar" -d out/classes src/test/*.java
-java -cp "out/classes;lib/sqlite-jdbc-3.7.15-M1.jar" test.Meny
+javac -cp "lib/sqlite-jdbc-3.7.15-M1.jar" -d out/production/min_labb3 src/main/java/bank/*.java
+java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.7.15-M1.jar" bank.Meny
 ```
 
 ### Kör med JAR
@@ -59,7 +59,7 @@ java -jar min_labb3.jar
 ## Projektstruktur
 
 ```
-src/test/
+src/main/java/bank/
 ├── Meny.java              # Startpunkt — huvudmeny
 ├── Val.java               # Undermeny för registervård
 ├── Kontohantering.java    # Kontosökning

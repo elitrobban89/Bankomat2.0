@@ -1,4 +1,4 @@
-package test;
+package bank;
 
 import javax.swing.*;
 import java.awt.*;
