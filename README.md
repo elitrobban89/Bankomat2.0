@@ -24,7 +24,7 @@ Ett internt bankhanteringssystem byggt med Java Swing och SQLite. Applikationen 
 Projektet är uppdelat i tre lager:
 
 ```
-UI-lager          Meny, Val, Kontohantering, NewJFrame3
+UI-lager          Meny, Val, Kontohantering, NyPersonForm, NyttKontoForm, TransaktionDialog
     ↓
 Servicelager      BankService — affärslogik och validering
     ↓
@@ -69,7 +69,9 @@ min_labb3/
 │               ├── Meny.java              # Startpunkt — huvudmeny
 │               ├── Val.java               # Undermeny för registervård
 │               ├── Kontohantering.java    # Kontosökning
-│               ├── NewJFrame3.java        # Formulär för nytt konto
+│               ├── NyPersonForm.java      # Formulär för ny kontoinnehavare
+│               ├── NyttKontoForm.java     # Formulär för nytt konto
+│               ├── TransaktionDialog.java # Dialog för insättning, uttag och överföring
 │               ├── UITheme.java           # Gemensam styling (färger, knappar, kort)
 │               ├── BankService.java       # Affärslogik och validering
 │               ├── BankRepository.java    # Databasåtkomst
