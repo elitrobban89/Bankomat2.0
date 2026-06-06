@@ -49,11 +49,11 @@ public class Meny extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnRegister) {
+            this.setVisible(false);
             new Val(bankService, this).setVisible(true);
-            this.setVisible(false);
         } else if (e.getSource() == btnAccount) {
-            new Kontohantering(bankService, this).setVisible(true);
             this.setVisible(false);
+            new Kontohantering(bankService, this).setVisible(true);
         }
     }
 

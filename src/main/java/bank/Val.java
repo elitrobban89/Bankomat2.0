@@ -18,9 +18,12 @@ public class Val extends JFrame implements ActionListener {
         this.meny        = meny;
         setTitle("Registervård");
         setSize(400, 420);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        addWindowListener(new WindowAdapter() {
+            @Override public void windowClosing(WindowEvent e) { meny.setVisible(true); }
+        });
         setupGUI();
     }
 
@@ -43,8 +46,8 @@ public class Val extends JFrame implements ActionListener {
         btnNyttKonto.addActionListener(this);
         btnVisaPersoner.addActionListener(this);
         btnTillbaka.addActionListener(e -> {
-            this.setVisible(false);
             meny.setVisible(true);
+            dispose();
         });
 
         card.add(btnNyKontoinnehavare);

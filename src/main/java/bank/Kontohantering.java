@@ -3,6 +3,8 @@ package bank;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 public class Kontohantering extends JFrame {
@@ -19,9 +21,12 @@ public class Kontohantering extends JFrame {
         this.meny        = meny;
         setTitle("Kontohantering");
         setSize(480, 560);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        addWindowListener(new WindowAdapter() {
+            @Override public void windowClosing(WindowEvent e) { meny.setVisible(true); }
+        });
         setupGUI();
     }
 
@@ -129,7 +134,7 @@ public class Kontohantering extends JFrame {
         r5.fill = GridBagConstraints.HORIZONTAL;
 
         JButton btnTillbaka = UITheme.secondaryButton("Tillbaka");
-        btnTillbaka.addActionListener(e -> { this.setVisible(false); meny.setVisible(true); });
+        btnTillbaka.addActionListener(e -> { meny.setVisible(true); dispose(); });
         card.add(btnTillbaka, r5);
 
         setTransactionButtonsEnabled(false);
