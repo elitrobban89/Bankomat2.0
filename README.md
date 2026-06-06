@@ -19,6 +19,11 @@ Ett internt bankhanteringssystem byggt med Java Swing och SQLite. Applikationen 
 - Saldo uppdateras automatiskt efter varje transaktion
 - Ta bort konto (alla tillhörande transaktioner tas också bort)
 
+## Fönsterhantering
+
+- Stänger man ett underfönster (Registervård eller Kontohantering) med X-knappen visas huvudmenyn automatiskt igen
+- Alla underfönster använder `DISPOSE_ON_CLOSE` så att fönsterobjekt frigörs korrekt från minnet
+
 ## Teknisk stack
 
 | Komponent | Teknologi |
