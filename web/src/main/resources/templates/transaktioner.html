@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Transaktioner')}"></head>
+<body>
+<div class="page">
+
+  <div th:replace="~{fragments :: header('Transaktioner')}"></div>
+
+  <main class="main">
+    <div class="card">
+      <p style="font-size:13px;color:var(--hint);margin-bottom:14px;">
+        Konto: <strong th:text="${kontonr}">12345</strong>
+      </p>
+
+      <div th:if="${transactions.isEmpty()}" class="empty">
+        Inga transaktioner registrerade för detta konto.
+      </div>
+
+      <ul class="item-list" th:unless="${transactions.isEmpty()}">
+        <li th:each="t : ${transactions}">
+          <span class="trans-type"
+                th:text="${#strings.startsWith(t,'Insättning') ? 'Insättning' : 'Uttag'}"
+                th:classappend="${#strings.startsWith(t,'Insättning') ? 'trans-ins' : 'trans-utt'}">
+            Insättning
+          </span>
+          <span class="trans-amount" th:text="${t}">500,00 kr</span>
+        </li>
+      </ul>
+
+      <hr class="divider"/>
+      <a class="btn btn-secondary btn-full"
+         th:href="@{/kontohantering(kontonr=${kontonr})}">Tillbaka</a>
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

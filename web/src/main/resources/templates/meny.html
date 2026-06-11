@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Bankomat 2.0')}"></head>
+<body>
+<div class="page">
+
+  <div th:replace="~{fragments :: header('Bankomat 2.0')}"></div>
+
+  <main class="main">
+    <div class="card">
+      <div class="btn-stack">
+        <a class="btn btn-primary btn-full" th:href="@{/registervard}">Registervård</a>
+        <a class="btn btn-primary btn-full" th:href="@{/kontohantering}">Kontohantering</a>
+      </div>
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="head(title)">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${title} + ' – Bankomat 2.0'">Bankomat 2.0</title>
+  <link rel="stylesheet" th:href="@{/style.css}"/>
+</th:block>
+
+<div th:fragment="header(title)" class="header">
+  <h1 th:text="${title}">Bankomat 2.0</h1>
+</div>
+
+<th:block th:fragment="alerts">
+  <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+</th:block>
+
+</body>
+</html>

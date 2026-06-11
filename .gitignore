@@ -35,3 +35,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Maven build output ###
+web/target/
+web/app.log

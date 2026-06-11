@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Registervård')}"></head>
+<body>
+<div class="page">
+
+  <div th:replace="~{fragments :: header('Registervård')}"></div>
+
+  <main class="main">
+    <div class="card">
+      <div class="btn-stack">
+        <a class="btn btn-primary btn-full" th:href="@{/registervard/ny-person}">Ny kontoinnehavare</a>
+        <a class="btn btn-primary btn-full" th:href="@{/registervard/nytt-konto}">Nytt konto</a>
+        <a class="btn btn-secondary btn-full" th:href="@{/registervard/personer}">Visa kontoinnehavare</a>
+        <a class="btn btn-secondary btn-full" th:href="@{/}">Tillbaka</a>
+      </div>
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

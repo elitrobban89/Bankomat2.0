@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: bankomat-2-0
+    env: docker
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PGHOST
+        fromDatabase:
+          name: bankomat-db
+          property: host
+      - key: PGPORT
+        fromDatabase:
+          name: bankomat-db
+          property: port
+      - key: PGDATABASE
+        fromDatabase:
+          name: bankomat-db
+          property: database
+      - key: PGUSER
+        fromDatabase:
+          name: bankomat-db
+          property: user
+      - key: PGPASSWORD
+        fromDatabase:
+          name: bankomat-db
+          property: password
+
+databases:
+  - name: bankomat-db
+    databaseName: bankomat
+    plan: free

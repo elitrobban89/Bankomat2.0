@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Kontoinnehavare')}"></head>
+<body>
+<div class="page">
+
+  <div th:replace="~{fragments :: header('Kontoinnehavare')}"></div>
+
+  <main class="main">
+    <div class="card">
+      <th:block th:replace="~{fragments :: alerts}"></th:block>
+
+      <div th:if="${persons.isEmpty()}" class="empty">
+        Inga kontoinnehavare registrerade.
+      </div>
+
+      <ul class="item-list" th:unless="${persons.isEmpty()}">
+        <li th:each="p : ${persons}">
+          <span th:text="${p}">Anna Svensson</span>
+          <form th:action="@{/registervard/ta-bort-person}" method="post"
+                onsubmit="return confirm('Ta bort ' + this.dataset.name + '?')"
+                th:data-name="${p}">
+            <input type="hidden" name="name" th:value="${p}"/>
+            <button type="submit" class="btn btn-danger"
+                    style="padding:5px 12px;font-size:13px;">Ta bort</button>
+          </form>
+        </li>
+      </ul>
+
+      <hr class="divider"/>
+      <a class="btn btn-secondary btn-full" th:href="@{/registervard}">Tillbaka</a>
+    </div>
+  </main>
+
+</div>
+</body>
+</html>
