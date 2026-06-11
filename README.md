@@ -122,6 +122,16 @@ min_labb3/
 └── README.md
 ```
 
+## Testdata (werasbetal.db)
+
+Databasen innehåller Looney Tunes-karaktärer som testdata:
+
+| Kontonummer | Typ | Innehavare | Saldo |
+|-------------|-----|------------|-------|
+| 121223 | Sparkonto | Sylvester | 16 000,50 kr |
+| 12034500 | Lönekonto | Sylvester | 540,11 kr |
+| 8264i33 | Sparkonto | Elmer Fudd | 1 000,50 kr |
+
 ## Regler och begränsningar
 
 - Kontonummer måste vara minst 5 siffror
