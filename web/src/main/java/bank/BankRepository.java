@@ -75,15 +75,27 @@ public class BankRepository {
         return result.isEmpty() ? null : result.get(0);
     }
 
-    public List<String> getTransactions(String kontonr) {
+    public List<KontoInfo> getAccountsByPerson(String namn) {
         return jdbc.query(
-                "SELECT typ, belopp, ocrmeddelande FROM bank_gjordatrans WHERE kontonr = ? ORDER BY id DESC",
-                (rs, i) -> {
-                    String typLabel = "ins".equals(rs.getString(1)) ? "Insättning" : "Uttag";
-                    String ocr = rs.getString(3);
-                    String ocrPart = (ocr != null && !ocr.isBlank()) ? "  –  " + ocr : "";
-                    return String.format("%-10s  %,.2f kr%s", typLabel, rs.getDouble(2), ocrPart);
-                },
+                "SELECT kontonr, kontotyp, namn, saldo FROM bank_konto WHERE namn = ? ORDER BY kontonr",
+                (rs, i) -> new KontoInfo(rs.getString(1), rs.getString(2), rs.getString(3), rs.getDouble(4)),
+                namn);
+    }
+
+    public List<KontoInfo> getAllAccounts() {
+        return jdbc.query(
+                "SELECT kontonr, kontotyp, namn, saldo FROM bank_konto ORDER BY namn, kontonr",
+                (rs, i) -> new KontoInfo(rs.getString(1), rs.getString(2), rs.getString(3), rs.getDouble(4)));
+    }
+
+    public List<TransactionInfo> getTransactions(String kontonr) {
+        return jdbc.query(
+                "SELECT typ, belopp, ocrmeddelande, created_at FROM bank_gjordatrans WHERE kontonr = ? ORDER BY id DESC",
+                (rs, i) -> new TransactionInfo(
+                        rs.getString(1),
+                        rs.getDouble(2),
+                        rs.getString(3),
+                        rs.getObject(4, java.time.LocalDateTime.class)),
                 kontonr);
     }
 }

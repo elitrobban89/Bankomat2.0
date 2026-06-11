@@ -17,13 +17,22 @@
       </div>
 
       <ul class="item-list" th:unless="${transactions.isEmpty()}">
-        <li th:each="t : ${transactions}">
-          <span class="trans-type"
-                th:text="${#strings.startsWith(t,'Insättning') ? 'Insättning' : 'Uttag'}"
-                th:classappend="${#strings.startsWith(t,'Insättning') ? 'trans-ins' : 'trans-utt'}">
-            Insättning
-          </span>
-          <span class="trans-amount" th:text="${t}">500,00 kr</span>
+        <li th:each="t : ${transactions}" style="flex-direction:column;align-items:flex-start;gap:4px;">
+          <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+            <span class="trans-type"
+                  th:text="${t.typDisplay()}"
+                  th:style="${t.typ() == 'ins'} ? 'color:var(--ok-txt);font-weight:bold' : 'color:var(--err-txt);font-weight:bold'">
+              Insättning
+            </span>
+            <span style="font-weight:bold;font-family:monospace;"
+                  th:text="${(t.typ() == 'ins' ? '+' : '-')} + ${#numbers.formatDecimal(t.belopp(),1,'WHITESPACE',2,'COMMA')} + ' kr'">
+              +500,00 kr
+            </span>
+          </div>
+          <div style="display:flex;justify-content:space-between;width:100%;font-size:12px;color:var(--hint);">
+            <span th:text="${t.ocr() != null and !#strings.isEmpty(t.ocr())} ? ${t.ocr()} : '–'">OCR</span>
+            <span th:text="${t.datumDisplay()}">2024-01-01 12:00</span>
+          </div>
         </li>
       </ul>
 

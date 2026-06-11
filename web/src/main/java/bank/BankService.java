@@ -89,7 +89,15 @@ public class BankService {
         return info;
     }
 
-    public List<String> getTransactions(String kontonr) {
+    public List<KontoInfo> getAccountsByPerson(String namn) {
+        return repo.getAccountsByPerson(namn);
+    }
+
+    public List<KontoInfo> getAllAccounts() {
+        return repo.getAllAccounts();
+    }
+
+    public List<TransactionInfo> getTransactions(String kontonr) {
         return repo.getTransactions(kontonr);
     }
 

@@ -17,5 +17,9 @@ CREATE TABLE IF NOT EXISTS bank_gjordatrans (
     kontonr       VARCHAR(13),
     typ           VARCHAR(3),
     belopp        DOUBLE PRECISION,
-    ocrmeddelande VARCHAR(70)
+    ocrmeddelande VARCHAR(70),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add created_at to existing databases that lack it
+ALTER TABLE bank_gjordatrans ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;

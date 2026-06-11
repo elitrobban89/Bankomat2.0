@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Konton')}"></head>
+<body>
+<div class="page">
+
+  <div th:replace="~{fragments :: header('Konton')}"></div>
+
+  <main class="main">
+    <div class="card">
+      <p style="font-size:13px;color:var(--hint);margin-bottom:14px;">
+        Kontoinnehavare: <strong th:text="${namn}">Anna Svensson</strong>
+      </p>
+
+      <div th:if="${konton.isEmpty()}" class="empty">
+        Inga konton registrerade för denna person.
+      </div>
+
+      <ul class="item-list" th:unless="${konton.isEmpty()}">
+        <li th:each="k : ${konton}">
+          <div>
+            <div style="font-weight:bold;font-size:14px;" th:text="${k.kontonr}">12345</div>
+            <div style="font-size:12px;color:var(--hint);" th:text="${k.kontotypDisplay()}">Sparkonto</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <span style="font-weight:bold;color:var(--primary);"
+                  th:text="${#numbers.formatDecimal(k.saldo,1,'WHITESPACE',2,'COMMA')} + ' kr'">0,00 kr</span>
+            <a class="btn btn-secondary" th:href="@{/kontohantering(kontonr=${k.kontonr})}"
+               style="padding:5px 12px;font-size:13px;">Hantera</a>
+          </div>
+        </li>
+      </ul>
+
+      <hr class="divider"/>
+      <a class="btn btn-secondary btn-full" th:href="@{/registervard/personer}">Tillbaka</a>
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

@@ -16,14 +16,20 @@
 
       <ul class="item-list" th:unless="${persons.isEmpty()}">
         <li th:each="p : ${persons}">
-          <span th:text="${p}">Anna Svensson</span>
-          <form th:action="@{/registervard/ta-bort-person}" method="post"
-                onsubmit="return confirm('Ta bort ' + this.dataset.name + '?')"
-                th:data-name="${p}">
-            <input type="hidden" name="name" th:value="${p}"/>
-            <button type="submit" class="btn btn-danger"
-                    style="padding:5px 12px;font-size:13px;">Ta bort</button>
-          </form>
+          <a th:href="@{/registervard/konton(namn=${p})}"
+             th:text="${p}" style="color:var(--primary);text-decoration:none;font-weight:bold;">
+            Anna Svensson
+          </a>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <a class="btn btn-secondary" th:href="@{/registervard/konton(namn=${p})}"
+               style="padding:5px 12px;font-size:13px;">Konton</a>
+            <form th:action="@{/registervard/ta-bort-person}" method="post"
+                  th:onsubmit="|return confirm('Ta bort ${p}?')|">
+              <input type="hidden" name="name" th:value="${p}"/>
+              <button type="submit" class="btn btn-danger"
+                      style="padding:5px 12px;font-size:13px;">Ta bort</button>
+            </form>
+          </div>
         </li>
       </ul>
 

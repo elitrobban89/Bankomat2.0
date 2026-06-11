@@ -93,6 +93,21 @@ public class BankController {
         return "redirect:/registervard/personer";
     }
 
+    @GetMapping("/registervard/konton")
+    public String kontonPerPerson(@RequestParam String namn, Model model) {
+        model.addAttribute("namn", namn);
+        model.addAttribute("konton", bankService.getAccountsByPerson(namn));
+        return "konton-per-person";
+    }
+
+    // ─── Kontoöversikt ────────────────────────────────────────────────────────
+
+    @GetMapping("/kontoversikt")
+    public String kontoversikt(Model model) {
+        model.addAttribute("konton", bankService.getAllAccounts());
+        return "kontoversikt";
+    }
+
     // ─── Kontohantering ───────────────────────────────────────────────────────
 
     @GetMapping("/kontohantering")
