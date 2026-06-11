@@ -46,6 +46,18 @@ Ett internt bankhanteringssystem med två versioner:
 | Templating | Thymeleaf |
 | Databas | PostgreSQL |
 | Hosting | Render (Docker) |
+| Font | Share Tech Mono (Google Fonts) |
+
+## Webbdesign
+
+Webbversionen är designad som en riktig bankomat:
+
+- **Mörk ATM-kropp** med kortläsare, sifferblock och uttagsfack
+- **Neongrön fosforskärm** med CRT-scanlines och glow-effekter
+- **Terminal-typsnitt** (Share Tech Mono) för autentisk känsla
+- **Flimmeranimation** på loggan och pulserande hover-effekter
+- **Laddningsindikator** visas vid alla formulärinskickningar
+- **Mobilanpassad** — sidobchottar och knappsats döljs på små skärmar
 
 ## Arkitektur
 
