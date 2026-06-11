@@ -101,6 +101,10 @@ public class BankService {
         return repo.getTransactions(kontonr);
     }
 
+    public double getTotalSaldo(String namn) {
+        return repo.getTotalSaldo(namn);
+    }
+
     public List<String> getAllPersonNames() {
         return repo.getAllPersonNames();
     }

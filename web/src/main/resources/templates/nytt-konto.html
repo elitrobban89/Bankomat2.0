@@ -2,47 +2,51 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Nytt konto')}"></head>
 <body>
-<div class="page">
-
-  <div th:replace="~{fragments :: header('Nytt konto')}"></div>
-
-  <main class="main">
-    <div class="card">
-      <th:block th:replace="~{fragments :: alerts}"></th:block>
-
-      <form th:action="@{/registervard/nytt-konto}" method="post">
-        <div class="form-group">
-          <label for="kontonr">Kontonummer * <span class="hint">(minst 5 siffror)</span></label>
-          <input type="text" id="kontonr" name="kontonr" required
-                 th:value="${formKontonr}" placeholder="1234567890"/>
+<div class="atm-machine">
+  <div th:replace="~{fragments :: atm-top}"></div>
+  <div class="atm-mid">
+    <div th:replace="~{fragments :: atm-side-left}"></div>
+    <div class="atm-screen">
+      <div th:replace="~{fragments :: screen-bar('NYTT KONTO')}"></div>
+      <div class="screen-main">
+        <div class="card">
+          <th:block th:replace="~{fragments :: alerts}"></th:block>
+          <form th:action="@{/registervard/nytt-konto}" method="post">
+            <div class="form-group">
+              <label for="kontonr">Kontonummer * <span class="hint">(minst 5 siffror)</span></label>
+              <input type="text" id="kontonr" name="kontonr" required
+                     th:value="${formKontonr}" placeholder="1234567890"/>
+            </div>
+            <div class="form-group">
+              <label for="kontotyp">Kontotyp *</label>
+              <select id="kontotyp" name="kontotyp" required>
+                <option value="" disabled th:selected="${formKontotyp == null}">Välj kontotyp…</option>
+                <option value="spar" th:selected="${formKontotyp == 'spar'}">Sparkonto</option>
+                <option value="loen" th:selected="${formKontotyp == 'loen'}">Lönekonto</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="namn">Kontoinnehavare * <span class="hint">(måste vara registrerad)</span></label>
+              <input type="text" id="namn" name="namn" required
+                     th:value="${formNamn}" placeholder="Förnamn Efternamn"/>
+            </div>
+            <div class="form-group">
+              <label for="saldo">Startsaldo <span class="hint">(kr, valfritt)</span></label>
+              <input type="text" id="saldo" name="saldo"
+                     th:value="${formSaldo}" placeholder="0"/>
+            </div>
+            <hr class="divider"/>
+            <div class="btn-row btn-row-2">
+              <button type="submit" class="btn btn-primary">Skapa konto</button>
+              <a class="btn btn-secondary" th:href="@{/registervard}">Tillbaka</a>
+            </div>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="kontotyp">Kontotyp *</label>
-          <select id="kontotyp" name="kontotyp" required>
-            <option value="" disabled th:selected="${formKontotyp == null}">Välj kontotyp…</option>
-            <option value="spar" th:selected="${formKontotyp == 'spar'}">Sparkonto</option>
-            <option value="loen" th:selected="${formKontotyp == 'loen'}">Lönekonto</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="namn">Kontoinnehavare * <span class="hint">(måste vara registrerad)</span></label>
-          <input type="text" id="namn" name="namn" required
-                 th:value="${formNamn}" placeholder="Förnamn Efternamn"/>
-        </div>
-        <div class="form-group">
-          <label for="saldo">Startsaldo <span class="hint">(kr, valfritt)</span></label>
-          <input type="text" id="saldo" name="saldo"
-                 th:value="${formSaldo}" placeholder="0"/>
-        </div>
-        <hr class="divider"/>
-        <div class="btn-row btn-row-2">
-          <button type="submit" class="btn btn-primary">Skapa konto</button>
-          <a class="btn btn-secondary" th:href="@{/registervard}">Tillbaka</a>
-        </div>
-      </form>
+      </div>
     </div>
-  </main>
-
+    <div th:replace="~{fragments :: atm-side-right}"></div>
+  </div>
+  <div th:replace="~{fragments :: atm-bottom}"></div>
 </div>
 </body>
 </html>

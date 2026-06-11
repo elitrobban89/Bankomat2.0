@@ -88,6 +88,13 @@ public class BankRepository {
                 (rs, i) -> new KontoInfo(rs.getString(1), rs.getString(2), rs.getString(3), rs.getDouble(4)));
     }
 
+    public double getTotalSaldo(String namn) {
+        Double total = jdbc.queryForObject(
+                "SELECT COALESCE(SUM(saldo), 0) FROM bank_konto WHERE namn = ?",
+                Double.class, namn);
+        return total != null ? total : 0.0;
+    }
+
     public List<TransactionInfo> getTransactions(String kontonr) {
         return jdbc.query(
                 "SELECT typ, belopp, ocrmeddelande, created_at FROM bank_gjordatrans WHERE kontonr = ? ORDER BY id DESC",

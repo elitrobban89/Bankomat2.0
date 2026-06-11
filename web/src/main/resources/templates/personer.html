@@ -2,42 +2,49 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Kontoinnehavare')}"></head>
 <body>
-<div class="page">
+<div class="atm-machine">
+  <div th:replace="~{fragments :: atm-top}"></div>
+  <div class="atm-mid">
+    <div th:replace="~{fragments :: atm-side-left}"></div>
+    <div class="atm-screen">
+      <div th:replace="~{fragments :: screen-bar('KONTOINNEHAVARE')}"></div>
+      <div class="screen-main">
+        <div class="card">
+          <th:block th:replace="~{fragments :: alerts}"></th:block>
 
-  <div th:replace="~{fragments :: header('Kontoinnehavare')}"></div>
-
-  <main class="main">
-    <div class="card">
-      <th:block th:replace="~{fragments :: alerts}"></th:block>
-
-      <div th:if="${persons.isEmpty()}" class="empty">
-        Inga kontoinnehavare registrerade.
-      </div>
-
-      <ul class="item-list" th:unless="${persons.isEmpty()}">
-        <li th:each="p : ${persons}">
-          <a th:href="@{/registervard/konton(namn=${p})}"
-             th:text="${p}" style="color:var(--primary);text-decoration:none;font-weight:bold;">
-            Anna Svensson
-          </a>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <a class="btn btn-secondary" th:href="@{/registervard/konton(namn=${p})}"
-               style="padding:5px 12px;font-size:13px;">Konton</a>
-            <form th:action="@{/registervard/ta-bort-person}" method="post"
-                  th:onsubmit="|return confirm('Ta bort ${p}?')|">
-              <input type="hidden" name="name" th:value="${p}"/>
-              <button type="submit" class="btn btn-danger"
-                      style="padding:5px 12px;font-size:13px;">Ta bort</button>
-            </form>
+          <div th:if="${persons.isEmpty()}" class="empty">
+            Inga kontoinnehavare registrerade.
           </div>
-        </li>
-      </ul>
 
-      <hr class="divider"/>
-      <a class="btn btn-secondary btn-full" th:href="@{/registervard}">Tillbaka</a>
+          <ul class="item-list" th:unless="${persons.isEmpty()}">
+            <li th:each="p : ${persons}">
+              <a th:href="@{/registervard/konton(namn=${p})}"
+                 th:text="${p}"
+                 style="color:var(--grn);text-decoration:none;font-weight:bold;
+                        text-shadow:0 0 6px rgba(0,255,80,.3);">
+                Anna Svensson
+              </a>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <a class="btn btn-secondary" th:href="@{/registervard/konton(namn=${p})}"
+                   style="padding:5px 12px;font-size:10px;">Konton</a>
+                <form th:action="@{/registervard/ta-bort-person}" method="post"
+                      th:onsubmit="|return confirm('Ta bort ${p}?')|">
+                  <input type="hidden" name="name" th:value="${p}"/>
+                  <button type="submit" class="btn btn-danger"
+                          style="padding:5px 12px;font-size:10px;">Ta bort</button>
+                </form>
+              </div>
+            </li>
+          </ul>
+
+          <hr class="divider"/>
+          <a class="btn btn-secondary btn-full" th:href="@{/registervard}">Tillbaka</a>
+        </div>
+      </div>
     </div>
-  </main>
-
+    <div th:replace="~{fragments :: atm-side-right}"></div>
+  </div>
+  <div th:replace="~{fragments :: atm-bottom}"></div>
 </div>
 </body>
 </html>

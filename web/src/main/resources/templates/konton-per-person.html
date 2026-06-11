@@ -2,40 +2,56 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Konton')}"></head>
 <body>
-<div class="page">
+<div class="atm-machine">
+  <div th:replace="~{fragments :: atm-top}"></div>
+  <div class="atm-mid">
+    <div th:replace="~{fragments :: atm-side-left}"></div>
+    <div class="atm-screen">
+      <div th:replace="~{fragments :: screen-bar('KONTON')}" ></div>
+      <div class="screen-main">
+        <div class="card">
+          <p style="font-size:11px;color:var(--txt-d);margin-bottom:12px;letter-spacing:1px;">
+            INNEHAVARE: <strong style="color:var(--grn);text-shadow:0 0 6px rgba(0,255,80,.3);"
+                                th:text="${namn}">Anna</strong>
+          </p>
 
-  <div th:replace="~{fragments :: header('Konton')}"></div>
+          <div th:if="${konton.isEmpty()}" class="empty">
+            Inga konton registrerade för denna person.
+          </div>
 
-  <main class="main">
-    <div class="card">
-      <p style="font-size:13px;color:var(--hint);margin-bottom:14px;">
-        Kontoinnehavare: <strong th:text="${namn}">Anna Svensson</strong>
-      </p>
+          <ul class="item-list" th:unless="${konton.isEmpty()}">
+            <li th:each="k : ${konton}">
+              <div>
+                <div style="font-weight:bold;font-size:13px;color:var(--grn);
+                            text-shadow:0 0 6px rgba(0,255,80,.25);"
+                     th:text="${k.kontonr}">12345</div>
+                <div style="font-size:11px;color:var(--txt-d);"
+                     th:text="${k.kontotypDisplay()}">Sparkonto</div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <span style="font-weight:bold;color:var(--grn);font-size:13px;
+                             text-shadow:0 0 6px rgba(0,255,80,.3);"
+                      th:text="${#numbers.formatDecimal(k.saldo,1,'WHITESPACE',2,'COMMA')} + ' kr'">0,00 kr</span>
+                <a class="btn btn-secondary" th:href="@{/kontohantering(kontonr=${k.kontonr})}"
+                   style="padding:5px 12px;font-size:10px;">Hantera</a>
+              </div>
+            </li>
+          </ul>
 
-      <div th:if="${konton.isEmpty()}" class="empty">
-        Inga konton registrerade för denna person.
+          <div class="total-saldo" th:unless="${konton.isEmpty()}">
+            <span class="lbl">Totalt saldo:</span>
+            <span class="val"
+                  th:text="${#numbers.formatDecimal(totalSaldo,1,'WHITESPACE',2,'COMMA')} + ' kr'">0,00 kr</span>
+          </div>
+
+          <hr class="divider"/>
+          <a class="btn btn-secondary btn-full" th:href="@{/registervard/personer}">Tillbaka</a>
+        </div>
       </div>
-
-      <ul class="item-list" th:unless="${konton.isEmpty()}">
-        <li th:each="k : ${konton}">
-          <div>
-            <div style="font-weight:bold;font-size:14px;" th:text="${k.kontonr}">12345</div>
-            <div style="font-size:12px;color:var(--hint);" th:text="${k.kontotypDisplay()}">Sparkonto</div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:center;">
-            <span style="font-weight:bold;color:var(--primary);"
-                  th:text="${#numbers.formatDecimal(k.saldo,1,'WHITESPACE',2,'COMMA')} + ' kr'">0,00 kr</span>
-            <a class="btn btn-secondary" th:href="@{/kontohantering(kontonr=${k.kontonr})}"
-               style="padding:5px 12px;font-size:13px;">Hantera</a>
-          </div>
-        </li>
-      </ul>
-
-      <hr class="divider"/>
-      <a class="btn btn-secondary btn-full" th:href="@{/registervard/personer}">Tillbaka</a>
     </div>
-  </main>
-
+    <div th:replace="~{fragments :: atm-side-right}"></div>
+  </div>
+  <div th:replace="~{fragments :: atm-bottom}"></div>
 </div>
 </body>
 </html>

@@ -2,17 +2,97 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
+<!-- HEAD -->
 <th:block th:fragment="head(title)">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title th:text="${title} + ' – Bankomat 2.0'">Bankomat 2.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" th:href="@{/style.css}"/>
 </th:block>
 
-<div th:fragment="header(title)" class="header">
-  <h1 th:text="${title}">Bankomat 2.0</h1>
+<!-- ATM TOP SECTION -->
+<div th:fragment="atm-top" class="atm-top">
+  <div class="atm-brand">BANKOMAT 2.0</div>
+  <div class="atm-subtitle">Weras Betalservice AB</div>
+  <div class="card-slot-outer">
+    <div class="card-slot-housing"><div class="card-slot-slit"></div></div>
+    <span class="card-slot-label">Sätt i kort / Insert card</span>
+  </div>
 </div>
 
+<!-- SIDE KEYS LEFT -->
+<div th:fragment="atm-side-left" class="atm-side left">
+  <div class="side-key"></div>
+  <div class="side-key"></div>
+  <div class="side-key"></div>
+  <div class="side-key"></div>
+</div>
+
+<!-- SIDE KEYS RIGHT -->
+<div th:fragment="atm-side-right" class="atm-side right">
+  <div class="side-key"></div>
+  <div class="side-key"></div>
+  <div class="side-key"></div>
+  <div class="side-key"></div>
+</div>
+
+<!-- SCREEN BAR -->
+<div th:fragment="screen-bar(title)" class="screen-bar">
+  <span class="screen-title" th:text="${title}">MENU</span>
+  <span class="screen-clock" id="screen-clock">--:--</span>
+</div>
+
+<!-- ATM BOTTOM (keypad + cash slot + loading + scripts) -->
+<div th:fragment="atm-bottom" class="atm-bottom-wrapper">
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <span class="loading-text">Bearbetar</span>
+  </div>
+  <div class="atm-keypad-section">
+    <div class="keypad-grid">
+      <div class="num-key">1</div><div class="num-key">2</div><div class="num-key">3</div>
+      <div class="num-key">4</div><div class="num-key">5</div><div class="num-key">6</div>
+      <div class="num-key">7</div><div class="num-key">8</div><div class="num-key">9</div>
+      <div class="num-key">*</div><div class="num-key">0</div><div class="num-key">#</div>
+    </div>
+    <div class="special-keys">
+      <div class="sp-key cancel">AVBRYT</div>
+      <div class="sp-key clear">RENSA</div>
+      <div class="sp-key enter">OK ▶</div>
+    </div>
+  </div>
+  <div class="atm-cash-slot">
+    <div class="cash-housing"><div class="cash-slit"></div></div>
+    <span class="cash-label">Uttagsfack / Cash dispenser</span>
+  </div>
+  <script>
+    (function () {
+      function tick() {
+        var el = document.getElementById('screen-clock');
+        if (!el) return;
+        var d = new Date();
+        el.textContent =
+          String(d.getHours()).padStart(2, '0') + ':' +
+          String(d.getMinutes()).padStart(2, '0');
+      }
+      tick();
+      setInterval(tick, 15000);
+
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('form').forEach(function (f) {
+          f.addEventListener('submit', function () {
+            var ov = document.getElementById('loading-overlay');
+            if (ov) ov.classList.add('show');
+          });
+        });
+      });
+    })();
+  </script>
+</div>
+
+<!-- ALERTS -->
 <th:block th:fragment="alerts">
   <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>

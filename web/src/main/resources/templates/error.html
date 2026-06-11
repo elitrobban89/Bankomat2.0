@@ -2,24 +2,32 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Fel')}"></head>
 <body>
-<div class="page">
-
-  <div th:replace="~{fragments :: header('Bankomat 2.0')}"></div>
-
-  <main class="main">
-    <div class="card" style="text-align:center;padding:48px 28px;">
-      <div style="font-size:3rem;margin-bottom:16px;"
-           th:text="${status == 404} ? '🔍' : '⚠️'">⚠️</div>
-      <h2 style="font-size:1.4rem;margin-bottom:8px;color:var(--text);"
-          th:text="${status == 404} ? 'Sidan hittades inte' : 'Något gick fel'">Något gick fel</h2>
-      <p style="color:var(--hint);font-size:14px;margin-bottom:24px;"
-         th:text="${status == 404} ? 'Sidan du letar efter finns inte.' : 'Ett oväntat fel uppstod. Försök igen.'">
-        Ett oväntat fel uppstod.
-      </p>
-      <a class="btn btn-primary" th:href="@{/}">Tillbaka till startsidan</a>
+<div class="atm-machine">
+  <div th:replace="~{fragments :: atm-top}"></div>
+  <div class="atm-mid">
+    <div th:replace="~{fragments :: atm-side-left}"></div>
+    <div class="atm-screen">
+      <div th:replace="~{fragments :: screen-bar('FEL')}"></div>
+      <div class="screen-main">
+        <div class="card" style="text-align:center;padding:40px 20px;">
+          <div style="font-size:3rem;margin-bottom:16px;"
+               th:text="${status == 404} ? '404' : '⚠'">⚠</div>
+          <div style="color:var(--err);font-size:13px;font-weight:bold;letter-spacing:3px;
+                      text-shadow:0 0 10px rgba(255,68,68,.4);margin-bottom:8px;"
+               th:text="${status == 404} ? 'SIDAN HITTADES INTE' : 'SYSTEMFEL'">SYSTEMFEL</div>
+          <p style="color:var(--txt-d);font-size:11px;letter-spacing:1px;margin-bottom:28px;"
+             th:text="${status == 404}
+               ? 'Sidan du letar efter finns inte.'
+               : 'Ett oväntat fel uppstod. Försök igen.'">
+            Ett oväntat fel uppstod.
+          </p>
+          <a class="btn btn-primary" th:href="@{/}">Tillbaka till startsidan</a>
+        </div>
+      </div>
     </div>
-  </main>
-
+    <div th:replace="~{fragments :: atm-side-right}"></div>
+  </div>
+  <div th:replace="~{fragments :: atm-bottom}"></div>
 </div>
 </body>
 </html>

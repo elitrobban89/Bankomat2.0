@@ -97,6 +97,7 @@ public class BankController {
     public String kontonPerPerson(@RequestParam String namn, Model model) {
         model.addAttribute("namn", namn);
         model.addAttribute("konton", bankService.getAccountsByPerson(namn));
+        model.addAttribute("totalSaldo", bankService.getTotalSaldo(namn));
         return "konton-per-person";
     }
 

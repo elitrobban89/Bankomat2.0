@@ -2,131 +2,133 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Kontohantering')}"></head>
 <body>
-<div class="page">
+<div class="atm-machine">
+  <div th:replace="~{fragments :: atm-top}"></div>
+  <div class="atm-mid">
+    <div th:replace="~{fragments :: atm-side-left}"></div>
+    <div class="atm-screen">
+      <div th:replace="~{fragments :: screen-bar('KONTOHANTERING')}"></div>
+      <div class="screen-main">
+        <div class="card">
+          <th:block th:replace="~{fragments :: alerts}"></th:block>
 
-  <div th:replace="~{fragments :: header('Kontohantering')}"></div>
-
-  <main class="main">
-    <div class="card">
-      <th:block th:replace="~{fragments :: alerts}"></th:block>
-
-      <!-- Search -->
-      <form th:action="@{/kontohantering}" method="get" class="search-row">
-        <input type="text" name="kontonr" placeholder="Kontonummer…"
-               th:value="${kontonr}" required/>
-        <button type="submit">Sök</button>
-      </form>
-
-      <!-- Account info (shown when konto is found) -->
-      <th:block th:if="${konto != null}">
-        <div class="konto-info">
-          <div class="konto-row">
-            <span class="lbl">Kontonummer</span>
-            <span class="val" th:text="${konto.kontonr}">12345</span>
-          </div>
-          <div class="konto-row">
-            <span class="lbl">Typ</span>
-            <span class="val" th:text="${konto.kontotypDisplay()}">Sparkonto</span>
-          </div>
-          <div class="konto-row">
-            <span class="lbl">Ägare</span>
-            <span class="val" th:text="${konto.namn}">Anna Svensson</span>
-          </div>
-          <div class="konto-row">
-            <span class="lbl">Saldo</span>
-            <span class="val saldo-big"
-                  th:text="${#numbers.formatDecimal(konto.saldo,1,'WHITESPACE',2,'COMMA')} + ' kr'">0,00 kr</span>
-          </div>
-        </div>
-
-        <!-- Transaction accordions -->
-        <p class="section-label">Transaktioner</p>
-
-        <details class="accordion">
-          <summary>Insättning</summary>
-          <div class="accordion-body">
-            <form th:action="@{/kontohantering/insattning}" method="post">
-              <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
-              <div class="form-group">
-                <label>Belopp (kr)</label>
-                <input type="text" name="belopp" placeholder="0.00" required/>
-              </div>
-              <div class="form-group">
-                <label>OCR-meddelande <span class="hint">(valfritt)</span></label>
-                <input type="text" name="ocr" placeholder=""/>
-              </div>
-              <button type="submit" class="btn btn-primary btn-full">Utför insättning</button>
-            </form>
-          </div>
-        </details>
-
-        <details class="accordion">
-          <summary>Uttag</summary>
-          <div class="accordion-body">
-            <form th:action="@{/kontohantering/uttag}" method="post">
-              <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
-              <div class="form-group">
-                <label>Belopp (kr)</label>
-                <input type="text" name="belopp" placeholder="0.00" required/>
-              </div>
-              <div class="form-group">
-                <label>OCR-meddelande <span class="hint">(valfritt)</span></label>
-                <input type="text" name="ocr" placeholder=""/>
-              </div>
-              <button type="submit" class="btn btn-primary btn-full">Utför uttag</button>
-            </form>
-          </div>
-        </details>
-
-        <details class="accordion">
-          <summary>Överföring</summary>
-          <div class="accordion-body">
-            <form th:action="@{/kontohantering/overforing}" method="post">
-              <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
-              <div class="form-group">
-                <label>Till kontonummer</label>
-                <input type="text" name="tillKonto" placeholder="Mottagarens kontonummer" required/>
-              </div>
-              <div class="form-group">
-                <label>Belopp (kr)</label>
-                <input type="text" name="belopp" placeholder="0.00" required/>
-              </div>
-              <div class="form-group">
-                <label>OCR-meddelande <span class="hint">(valfritt)</span></label>
-                <input type="text" name="ocr" placeholder=""/>
-              </div>
-              <button type="submit" class="btn btn-primary btn-full">Utför överföring</button>
-            </form>
-          </div>
-        </details>
-
-        <hr class="divider"/>
-
-        <!-- Secondary actions -->
-        <div class="btn-stack">
-          <a class="btn btn-secondary btn-full"
-             th:href="@{/kontohantering/transaktioner(kontonr=${konto.kontonr})}">
-            Visa transaktioner
-          </a>
-        </div>
-
-        <div class="danger-zone" style="margin-top:14px;">
-          <p>Ta bort konto <strong th:text="${konto.kontonr}">12345</strong> och alla dess transaktioner.</p>
-          <form th:action="@{/kontohantering/ta-bort}" method="post"
-                onsubmit="return confirm('Ta bort konto ' + this.dataset.konto + '? Alla transaktioner raderas.')"
-                th:data-konto="${konto.kontonr}">
-            <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
-            <button type="submit" class="btn btn-danger" style="white-space:nowrap;">Ta bort konto</button>
+          <!-- Search -->
+          <form th:action="@{/kontohantering}" method="get" class="search-row">
+            <input type="text" name="kontonr" placeholder="Kontonummer…"
+                   th:value="${kontonr}" required/>
+            <button type="submit">Sök</button>
           </form>
+
+          <!-- Account info -->
+          <th:block th:if="${konto != null}">
+            <div class="konto-info" style="margin-top:14px;">
+              <div class="konto-row">
+                <span class="lbl">Kontonummer</span>
+                <span class="val" th:text="${konto.kontonr}">12345</span>
+              </div>
+              <div class="konto-row">
+                <span class="lbl">Typ</span>
+                <span class="val" th:text="${konto.kontotypDisplay()}">Sparkonto</span>
+              </div>
+              <div class="konto-row">
+                <span class="lbl">Ägare</span>
+                <span class="val" th:text="${konto.namn}">Anna</span>
+              </div>
+              <div class="konto-row">
+                <span class="lbl">Saldo</span>
+                <span class="saldo-big"
+                      th:text="${#numbers.formatDecimal(konto.saldo,1,'WHITESPACE',2,'COMMA')} + ' kr'">0,00 kr</span>
+              </div>
+            </div>
+
+            <p class="section-label">Transaktioner</p>
+
+            <details class="accordion">
+              <summary>Insättning</summary>
+              <div class="accordion-body">
+                <form th:action="@{/kontohantering/insattning}" method="post">
+                  <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
+                  <div class="form-group">
+                    <label>Belopp (kr)</label>
+                    <input type="text" name="belopp" placeholder="0.00" required/>
+                  </div>
+                  <div class="form-group">
+                    <label>OCR-meddelande <span class="hint">(valfritt)</span></label>
+                    <input type="text" name="ocr" placeholder=""/>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-full">Utför insättning</button>
+                </form>
+              </div>
+            </details>
+
+            <details class="accordion">
+              <summary>Uttag</summary>
+              <div class="accordion-body">
+                <form th:action="@{/kontohantering/uttag}" method="post">
+                  <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
+                  <div class="form-group">
+                    <label>Belopp (kr)</label>
+                    <input type="text" name="belopp" placeholder="0.00" required/>
+                  </div>
+                  <div class="form-group">
+                    <label>OCR-meddelande <span class="hint">(valfritt)</span></label>
+                    <input type="text" name="ocr" placeholder=""/>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-full">Utför uttag</button>
+                </form>
+              </div>
+            </details>
+
+            <details class="accordion">
+              <summary>Överföring</summary>
+              <div class="accordion-body">
+                <form th:action="@{/kontohantering/overforing}" method="post">
+                  <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
+                  <div class="form-group">
+                    <label>Till kontonummer</label>
+                    <input type="text" name="tillKonto" placeholder="Mottagarens kontonummer" required/>
+                  </div>
+                  <div class="form-group">
+                    <label>Belopp (kr)</label>
+                    <input type="text" name="belopp" placeholder="0.00" required/>
+                  </div>
+                  <div class="form-group">
+                    <label>OCR-meddelande <span class="hint">(valfritt)</span></label>
+                    <input type="text" name="ocr" placeholder=""/>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-full">Utför överföring</button>
+                </form>
+              </div>
+            </details>
+
+            <hr class="divider"/>
+
+            <div class="btn-stack">
+              <a class="btn btn-secondary btn-full"
+                 th:href="@{/kontohantering/transaktioner(kontonr=${konto.kontonr})}">
+                Visa transaktioner
+              </a>
+            </div>
+
+            <div class="danger-zone" style="margin-top:12px;">
+              <p>Ta bort konto <strong th:text="${konto.kontonr}">12345</strong> och alla dess transaktioner.</p>
+              <form th:action="@{/kontohantering/ta-bort}" method="post"
+                    onsubmit="return confirm('Ta bort konto ' + this.dataset.konto + '? Alla transaktioner raderas.')"
+                    th:data-konto="${konto.kontonr}">
+                <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
+                <button type="submit" class="btn btn-danger">Ta bort konto</button>
+              </form>
+            </div>
+          </th:block>
+
+          <hr class="divider"/>
+          <a class="btn btn-secondary btn-full" th:href="@{/}">Tillbaka till meny</a>
         </div>
-
-      </th:block>
-
-      <hr class="divider"/>
-      <a class="btn btn-secondary btn-full" th:href="@{/}">Tillbaka</a>
+      </div>
     </div>
-  </main>
-
+    <div th:replace="~{fragments :: atm-side-right}"></div>
+  </div>
+  <div th:replace="~{fragments :: atm-bottom}"></div>
 </div>
 </body>
 </html>

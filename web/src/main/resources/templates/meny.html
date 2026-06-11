@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments :: head('Bankomat 2.0')}"></head>
+<head th:replace="~{fragments :: head('Meny')}"></head>
 <body>
-<div class="page">
-
-  <div th:replace="~{fragments :: header('Bankomat 2.0')}"></div>
-
-  <main class="main">
-    <div class="card">
-      <div class="btn-stack">
-        <a class="btn btn-primary btn-full" th:href="@{/registervard}">Registervård</a>
-        <a class="btn btn-primary btn-full" th:href="@{/kontohantering}">Kontohantering</a>
-        <a class="btn btn-secondary btn-full" th:href="@{/kontoversikt}">Kontoöversikt</a>
+<div class="atm-machine">
+  <div th:replace="~{fragments :: atm-top}"></div>
+  <div class="atm-mid">
+    <div th:replace="~{fragments :: atm-side-left}"></div>
+    <div class="atm-screen">
+      <div th:replace="~{fragments :: screen-bar('VÄLKOMMEN')}"></div>
+      <div class="screen-main">
+        <div class="screen-welcome">
+          <h2>Välj tjänst</h2>
+          <p>Tryck på önskat alternativ</p>
+        </div>
+        <a class="menu-btn" th:href="@{/registervard}">Registervård</a>
+        <a class="menu-btn" th:href="@{/kontohantering}">Kontohantering</a>
+        <a class="menu-btn secondary" th:href="@{/kontoversikt}">Kontoöversikt</a>
       </div>
     </div>
-  </main>
-
+    <div th:replace="~{fragments :: atm-side-right}"></div>
+  </div>
+  <div th:replace="~{fragments :: atm-bottom}"></div>
 </div>
 </body>
 </html>

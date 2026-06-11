@@ -2,46 +2,57 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Transaktioner')}"></head>
 <body>
-<div class="page">
+<div class="atm-machine">
+  <div th:replace="~{fragments :: atm-top}"></div>
+  <div class="atm-mid">
+    <div th:replace="~{fragments :: atm-side-left}"></div>
+    <div class="atm-screen">
+      <div th:replace="~{fragments :: screen-bar('TRANSAKTIONER')}"></div>
+      <div class="screen-main">
+        <div class="card">
+          <p style="font-size:11px;color:var(--txt-d);margin-bottom:12px;letter-spacing:1px;">
+            KONTO: <strong style="color:var(--grn);text-shadow:0 0 6px rgba(0,255,80,.3);"
+                           th:text="${kontonr}">12345</strong>
+          </p>
 
-  <div th:replace="~{fragments :: header('Transaktioner')}"></div>
+          <div th:if="${transactions.isEmpty()}" class="empty">
+            Inga transaktioner registrerade för detta konto.
+          </div>
 
-  <main class="main">
-    <div class="card">
-      <p style="font-size:13px;color:var(--hint);margin-bottom:14px;">
-        Konto: <strong th:text="${kontonr}">12345</strong>
-      </p>
+          <ul class="item-list" th:unless="${transactions.isEmpty()}">
+            <li th:each="t : ${transactions}"
+                style="flex-direction:column;align-items:flex-start;gap:4px;">
+              <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+                <span th:text="${t.typDisplay()}"
+                      th:style="${t.typ() == 'ins'}
+                        ? 'color:var(--grn);font-weight:bold;text-shadow:0 0 6px rgba(0,255,80,.3)'
+                        : 'color:var(--err);font-weight:bold;'">
+                  Insättning
+                </span>
+                <span style="font-weight:bold;"
+                      th:text="${(t.typ() == 'ins' ? '+' : '−')} + ${#numbers.formatDecimal(t.belopp(),1,'WHITESPACE',2,'COMMA')} + ' kr'"
+                      th:style="${t.typ() == 'ins'}
+                        ? 'color:var(--grn);text-shadow:0 0 6px rgba(0,255,80,.3)'
+                        : 'color:var(--err)'">
+                  +500,00 kr
+                </span>
+              </div>
+              <div style="display:flex;justify-content:space-between;width:100%;font-size:11px;color:var(--txt-d);">
+                <span th:text="${t.ocr() != null and !#strings.isEmpty(t.ocr())} ? ${t.ocr()} : '—'">OCR</span>
+                <span th:text="${t.datumDisplay()}">2024-01-01 12:00</span>
+              </div>
+            </li>
+          </ul>
 
-      <div th:if="${transactions.isEmpty()}" class="empty">
-        Inga transaktioner registrerade för detta konto.
+          <hr class="divider"/>
+          <a class="btn btn-secondary btn-full"
+             th:href="@{/kontohantering(kontonr=${kontonr})}">Tillbaka</a>
+        </div>
       </div>
-
-      <ul class="item-list" th:unless="${transactions.isEmpty()}">
-        <li th:each="t : ${transactions}" style="flex-direction:column;align-items:flex-start;gap:4px;">
-          <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
-            <span class="trans-type"
-                  th:text="${t.typDisplay()}"
-                  th:style="${t.typ() == 'ins'} ? 'color:var(--ok-txt);font-weight:bold' : 'color:var(--err-txt);font-weight:bold'">
-              Insättning
-            </span>
-            <span style="font-weight:bold;font-family:monospace;"
-                  th:text="${(t.typ() == 'ins' ? '+' : '-')} + ${#numbers.formatDecimal(t.belopp(),1,'WHITESPACE',2,'COMMA')} + ' kr'">
-              +500,00 kr
-            </span>
-          </div>
-          <div style="display:flex;justify-content:space-between;width:100%;font-size:12px;color:var(--hint);">
-            <span th:text="${t.ocr() != null and !#strings.isEmpty(t.ocr())} ? ${t.ocr()} : '–'">OCR</span>
-            <span th:text="${t.datumDisplay()}">2024-01-01 12:00</span>
-          </div>
-        </li>
-      </ul>
-
-      <hr class="divider"/>
-      <a class="btn btn-secondary btn-full"
-         th:href="@{/kontohantering(kontonr=${kontonr})}">Tillbaka</a>
     </div>
-  </main>
-
+    <div th:replace="~{fragments :: atm-side-right}"></div>
+  </div>
+  <div th:replace="~{fragments :: atm-bottom}"></div>
 </div>
 </body>
 </html>
