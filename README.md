@@ -1,6 +1,9 @@
 # Bankomat 2.0
 
-Ett internt bankhanteringssystem byggt med Java Swing och SQLite. Applikationen hanterar kontoinnehavare, konton och transaktioner via ett grafiskt gränssnitt.
+Ett internt bankhanteringssystem med två versioner:
+
+- **Webbversion (live):** [elitrobban.se/bankomat-2-0/](https://elitrobban.se/bankomat-2-0/) — Spring Boot + Thymeleaf + PostgreSQL, driftsatt på Render
+- **Skrivbordsversion:** Java Swing + SQLite, körs lokalt
 
 ## Funktioner
 
@@ -26,12 +29,23 @@ Ett internt bankhanteringssystem byggt med Java Swing och SQLite. Applikationen 
 
 ## Teknisk stack
 
+**Skrivbordsversion**
+
 | Komponent | Teknologi |
 |-----------|-----------|
 | GUI | Java Swing |
 | Databas | SQLite |
 | JDBC-driver | sqlite-jdbc 3.7.15 |
 | Java-version | Java 8+ |
+
+**Webbversion**
+
+| Komponent | Teknologi |
+|-----------|-----------|
+| Backend | Spring Boot 3 |
+| Templating | Thymeleaf |
+| Databas | PostgreSQL |
+| Hosting | Render (Docker) |
 
 ## Arkitektur
 
@@ -76,7 +90,17 @@ java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.7.15-M1.jar" bank.Meny
 
 ```
 min_labb3/
-├── src/
+├── web/                                   # Webbversion (Spring Boot)
+│   ├── pom.xml
+│   └── src/main/
+│       ├── java/bank/                     # Controller, Service, Repository
+│       └── resources/
+│           ├── templates/                 # Thymeleaf HTML-sidor
+│           ├── static/style.css
+│           └── application*.properties
+├── Dockerfile                             # Docker-bygge för Render
+├── render.yaml                            # Render-konfiguration
+├── src/                                   # Skrivbordsversion (Swing)
 │   └── main/
 │       └── java/
 │           └── bank/
