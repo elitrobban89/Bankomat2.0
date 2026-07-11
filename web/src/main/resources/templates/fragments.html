@@ -14,6 +14,17 @@
 
 <!-- ATM TOP SECTION -->
 <div th:fragment="atm-top" class="atm-top">
+  <div class="status-lamp" id="status-lamp">
+    <span class="led"></span>
+    <span class="lamp-label">I drift</span>
+  </div>
+  <div class="receipt-slot">
+    <div class="receipt-housing">
+      <div class="receipt-slit"></div>
+      <div class="receipt-wrap"></div>
+    </div>
+    <span class="receipt-label">Kvitto</span>
+  </div>
   <div class="atm-brand">BANKOMAT 2.0</div>
   <div class="atm-subtitle">Weras Betalservice AB</div>
   <div class="card-slot-outer">
@@ -92,27 +103,53 @@
       window.addEventListener('resize', fitAtm);
       window.addEventListener('load', fitAtm);
 
-      // CRT: rullande band + vinjett-overlay, samt power-on en gång per session
+      var reduceMotion = window.matchMedia &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // CRT: rullande band + vinjett-overlay på varje sida
       function crtSetup() {
         var screen = document.querySelector('.atm-screen');
         if (!screen) return;
         var ov = document.createElement('div');
         ov.className = 'crt-overlay';
         screen.appendChild(ov);
-        try {
-          if (sessionStorage.getItem('atmPowerOn')) return;
-          sessionStorage.setItem('atmPowerOn', '1');
-        } catch (e) { return; }
-        screen.classList.add('crt-on');
-        setTimeout(function () { screen.classList.remove('crt-on'); }, 1100);
       }
 
-      // Kortet glider in i kortläsaren (en gång per session)
-      function cardIntro() {
-        try {
-          if (sessionStorage.getItem('atmCardInserted')) return;
-          sessionStorage.setItem('atmCardInserted', '1');
-        } catch (e) { return; }
+      // Matrix-regn bakom maskinen
+      function matrixRain() {
+        if (reduceMotion || window.innerWidth <= 580) return;
+        var cv = document.createElement('canvas');
+        cv.className = 'matrix-bg';
+        document.body.appendChild(cv);
+        var ctx = cv.getContext('2d');
+        var chars = '01kr$€#*+=-<>01';
+        var fs = 14, drops = [];
+        function resize() {
+          cv.width = window.innerWidth;
+          cv.height = window.innerHeight;
+          drops = [];
+          for (var i = 0; i < Math.floor(cv.width / fs); i++) {
+            drops.push(Math.random() * -60);
+          }
+        }
+        resize();
+        window.addEventListener('resize', resize);
+        setInterval(function () {
+          if (document.hidden) return;
+          ctx.fillStyle = 'rgba(2,4,2,0.12)';
+          ctx.fillRect(0, 0, cv.width, cv.height);
+          ctx.fillStyle = 'rgba(0,255,127,0.32)';
+          ctx.font = fs + 'px monospace';
+          for (var i = 0; i < drops.length; i++) {
+            ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fs, drops[i] * fs);
+            if (drops[i] * fs > cv.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i] += 0.5;
+          }
+        }, 66);
+      }
+
+      // Kortet glider in i kortläsaren
+      function insertCardAnim() {
         var outer = document.querySelector('.card-slot-outer');
         if (!outer) return;
         var card = document.createElement('div');
@@ -125,8 +162,131 @@
         }, 2300);
       }
 
+      // Intro en gång per session:
+      // CRT power-on → BIOS-boot → SÄTT IN DITT KORT → kort → LÄSER KORT
+      function intro() {
+        if (reduceMotion) return;
+        try {
+          if (sessionStorage.getItem('atmIntro')) return;
+          sessionStorage.setItem('atmIntro', '1');
+        } catch (e) { return; }
+        var screen = document.querySelector('.atm-screen');
+        if (!screen) return;
+
+        screen.classList.add('crt-on');
+        setTimeout(function () { screen.classList.remove('crt-on'); }, 1100);
+
+        var ov = document.createElement('div');
+        ov.className = 'intro-overlay';
+        var boot = document.createElement('pre');
+        boot.className = 'boot-text';
+        ov.appendChild(boot);
+        screen.appendChild(ov);
+
+        var text = 'WERAS BETALSERVICE v2.0\n' +
+                   'SJÄLVTEST ......... OK\n' +
+                   'SEDELMATARE ....... OK\n' +
+                   'BANKNÄT ........... ANSLUTEN\n' +
+                   'SYSTEM REDO';
+        var i = 0;
+        var typer = setInterval(function () {
+          i += 2;
+          boot.textContent = text.slice(0, i);
+          if (i >= text.length) {
+            clearInterval(typer);
+            setTimeout(showPrompt, 500);
+          }
+        }, 14);
+
+        function showPrompt() {
+          boot.style.opacity = '0';
+          var p = document.createElement('div');
+          p.className = 'insert-prompt';
+          p.innerHTML =
+            '<div class="arrow">▲</div>' +
+            '<div class="prompt-card-icon"></div>' +
+            '<div class="prompt-title">Sätt in ditt kort</div>' +
+            '<div class="prompt-sub">Weras Betalservice AB</div>';
+          ov.appendChild(p);
+          requestAnimationFrame(function () { p.classList.add('show'); });
+          setTimeout(function () {
+            insertCardAnim();
+            setTimeout(function () {
+              p.querySelector('.arrow').style.visibility = 'hidden';
+              p.querySelector('.prompt-title').textContent = 'Läser kort';
+              p.querySelector('.prompt-sub').textContent = 'Ett ögonblick…';
+              setTimeout(function () {
+                ov.classList.add('done');
+                setTimeout(function () { ov.remove(); }, 550);
+              }, 900);
+            }, 1900);
+          }, 1100);
+        }
+      }
+
+      // Kvitto skrivs ut efter lyckad transaktion
+      function printReceipt() {
+        var alertEl = document.querySelector('.alert-success');
+        if (!alertEl) return;
+        var m = alertEl.textContent.match(/^(Uttag|Insättning|Överföring) på (.+? kr)/);
+        if (!m) return;
+        var wrap = document.querySelector('.receipt-wrap');
+        var housing = document.querySelector('.receipt-housing');
+        if (!wrap) return;
+        var d = new Date();
+        function pad(n) { return String(n).padStart(2, '0'); }
+        var paper = document.createElement('div');
+        paper.className = 'receipt-paper';
+        paper.textContent =
+          'WERAS BETALSERVICE\n' +
+          'BANKOMAT 2.0\n' +
+          '------------------\n' +
+          m[1].toUpperCase() + '\n' +
+          'BELOPP: ' + m[2] + '\n' +
+          d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+          '  ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + '\n' +
+          '------------------\n' +
+          'TACK OCH VÄLKOMMEN\n' +
+          'ÅTER!';
+        wrap.appendChild(paper);
+        if (housing) housing.classList.add('printing');
+        setTimeout(function () { paper.classList.add('printing'); }, 400);
+        setTimeout(function () {
+          if (housing) housing.classList.remove('printing');
+          paper.style.transform = 'translateY(0)';
+          paper.classList.remove('printing');
+          paper.classList.add('tearing');
+          setTimeout(function () { paper.remove(); }, 600);
+        }, 5400);
+      }
+
+      // Saldot räknas upp från 0
+      function animateCounts() {
+        if (reduceMotion) return;
+        document.querySelectorAll('.saldo-big, .total-saldo .val').forEach(function (el) {
+          var mm = el.textContent.trim().match(/^([\d\s ]+,\d{2})\s*kr$/);
+          if (!mm) return;
+          var target = parseFloat(mm[1].replace(/[\s ]/g, '').replace(',', '.'));
+          if (!isFinite(target) || target <= 0) return;
+          var t0 = performance.now(), dur = 700;
+          function fmt(v) {
+            var parts = v.toFixed(2).replace('.', ',').split(',');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            return parts.join(',') + ' kr';
+          }
+          function step(now) {
+            var p = Math.min(1, (now - t0) / dur);
+            var eased = 1 - Math.pow(1 - p, 3);
+            el.textContent = fmt(target * eased);
+            if (p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+      }
+
       // Sedlar ramlar ur uttagsfacket efter ett lyckat uttag
       function dispenseCash() {
+        if (reduceMotion) return;
         var alertEl = document.querySelector('.alert-success');
         if (!alertEl || alertEl.textContent.indexOf('Uttag') === -1) return;
         var slot = document.querySelector('.atm-cash-slot');
@@ -156,13 +316,18 @@
       document.addEventListener('DOMContentLoaded', function () {
         fitAtm();
         crtSetup();
-        cardIntro();
+        matrixRain();
+        intro();
         dispenseCash();
+        printReceipt();
+        animateCounts();
 
         document.querySelectorAll('form').forEach(function (f) {
           f.addEventListener('submit', function () {
             var ov = document.getElementById('loading-overlay');
             if (ov) ov.classList.add('show');
+            var lamp = document.getElementById('status-lamp');
+            if (lamp) lamp.classList.add('busy');
           });
         });
 

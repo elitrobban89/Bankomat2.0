@@ -10,9 +10,9 @@
       <div th:replace="~{fragments :: screen-bar('FEL')}"></div>
       <div class="screen-main">
         <div class="card" style="text-align:center;padding:40px 20px;">
-          <div style="font-size:3rem;margin-bottom:16px;"
+          <div class="err-glitch" style="font-size:3rem;margin-bottom:16px;"
                th:text="${status == 404} ? '404' : '⚠'">⚠</div>
-          <div style="color:var(--err);font-size:13px;font-weight:bold;letter-spacing:3px;
+          <div class="err-glitch" style="color:var(--err);font-size:13px;font-weight:bold;letter-spacing:3px;
                       text-shadow:0 0 10px rgba(255,68,68,.4);margin-bottom:8px;"
                th:text="${status == 404} ? 'SIDAN HITTADES INTE' : 'SYSTEMFEL'">SYSTEMFEL</div>
           <p style="color:var(--txt-d);font-size:11px;letter-spacing:1px;margin-bottom:28px;"
