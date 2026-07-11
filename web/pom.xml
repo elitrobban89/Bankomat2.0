@@ -17,6 +17,9 @@
 
     <properties>
         <java.version>17</java.version>
+        <!-- Spring Boot 3.2.5:s hanterade Mockito/Byte Buddy klarar inte Java 25-runtime -->
+        <mockito.version>5.23.0</mockito.version>
+        <byte-buddy.version>1.18.11</byte-buddy.version>
     </properties>
 
     <dependencies>
@@ -42,6 +45,11 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

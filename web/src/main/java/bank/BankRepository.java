@@ -39,14 +39,15 @@ public class BankRepository {
                 kontonr, kontotyp, namn, saldo);
     }
 
-    public double getSaldo(String kontonr) {
-        Double saldo = jdbc.queryForObject("SELECT saldo FROM bank_konto WHERE kontonr = ?", Double.class, kontonr);
-        if (saldo == null) throw new BankException("Kontonummer finns inte!");
-        return saldo;
+    public void addToSaldo(String kontonr, double belopp) {
+        jdbc.update("UPDATE bank_konto SET saldo = saldo + ? WHERE kontonr = ?", belopp, kontonr);
     }
 
-    public void updateSaldo(String kontonr, double saldo) {
-        jdbc.update("UPDATE bank_konto SET saldo = ? WHERE kontonr = ?", saldo, kontonr);
+    public boolean subtractFromSaldoIfSufficient(String kontonr, double belopp) {
+        int rows = jdbc.update(
+                "UPDATE bank_konto SET saldo = saldo - ? WHERE kontonr = ? AND saldo >= ?",
+                belopp, kontonr, belopp);
+        return rows > 0;
     }
 
     public void insertTransaction(String kontonr, String typ, double belopp, String ocr) {

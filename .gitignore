@@ -39,3 +39,6 @@ bin/
 ### Maven build output ###
 web/target/
 web/app.log
+
+### JAR build residue ###
+META-INF/

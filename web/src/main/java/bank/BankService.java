@@ -1,6 +1,7 @@
 package bank;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,47 +37,48 @@ public class BankService {
         if (!repo.personExists(namn))
             throw new BankException("Namnet finns inte, försök igen");
         double saldo = parseSaldo(saldoStr);
-        validateBelopp(saldo);
+        validateSaldo(saldo);
         repo.insertAccount(kontonr, kontotyp, namn, saldo);
     }
 
+    @Transactional
     public void deposit(String kontonr, String beloppStr, String ocr) {
         validateAccountNumber(kontonr);
         if (!repo.accountExists(kontonr))
             throw new BankException("Kontonumret finns inte");
         double belopp = parseBelopp(beloppStr);
         validateBelopp(belopp);
-        repo.updateSaldo(kontonr, repo.getSaldo(kontonr) + belopp);
+        repo.addToSaldo(kontonr, belopp);
         repo.insertTransaction(kontonr, "ins", belopp, ocr);
     }
 
+    @Transactional
     public void withdraw(String kontonr, String beloppStr, String ocr) {
         validateAccountNumber(kontonr);
         if (!repo.accountExists(kontonr))
             throw new BankException("Kontonumret finns inte");
         double belopp = parseBelopp(beloppStr);
         validateBelopp(belopp);
-        double saldo = repo.getSaldo(kontonr);
-        if (saldo < belopp)
+        if (!repo.subtractFromSaldoIfSufficient(kontonr, belopp))
             throw new BankException("Inte tillräckligt med pengar på kontot");
-        repo.updateSaldo(kontonr, saldo - belopp);
         repo.insertTransaction(kontonr, "utt", belopp, ocr);
     }
 
+    @Transactional
     public void transfer(String from, String to, String beloppStr, String ocr) {
         validateAccountNumber(from);
         validateAccountNumber(to);
+        if (from.equals(to))
+            throw new BankException("Det går inte att överföra till samma konto");
         if (!repo.accountExists(from))
             throw new BankException("Källkontonumret finns inte");
         if (!repo.accountExists(to))
             throw new BankException("Målkontonumret finns inte");
         double belopp = parseBelopp(beloppStr);
         validateBelopp(belopp);
-        double saldo = repo.getSaldo(from);
-        if (saldo < belopp)
+        if (!repo.subtractFromSaldoIfSufficient(from, belopp))
             throw new BankException("Inte tillräckligt med pengar på kontot");
-        repo.updateSaldo(from, saldo - belopp);
-        repo.updateSaldo(to, repo.getSaldo(to) + belopp);
+        repo.addToSaldo(to, belopp);
         repo.insertTransaction(from, "utt", belopp, ocr);
         repo.insertTransaction(to, "ins", belopp, ocr);
     }
@@ -115,6 +117,7 @@ public class BankService {
         repo.deletePerson(name);
     }
 
+    @Transactional
     public void deleteAccount(String kontonr) {
         if (!repo.accountExists(kontonr))
             throw new BankException("Kontot finns inte");
@@ -132,7 +135,16 @@ public class BankService {
     }
 
     private void validateBelopp(double belopp) {
+        if (belopp <= 0)
+            throw new BankException("Beloppet måste vara större än 0 kr");
         if (belopp > MAX_BELOPP)
+            throw new BankException("Galet belopp. Maxbelopp 20 000 kr");
+    }
+
+    private void validateSaldo(double saldo) {
+        if (saldo < 0)
+            throw new BankException("Saldot får inte vara negativt");
+        if (saldo > MAX_BELOPP)
             throw new BankException("Galet belopp. Maxbelopp 20 000 kr");
     }
 

@@ -23,3 +23,6 @@ CREATE TABLE IF NOT EXISTS bank_gjordatrans (
 
 -- Add created_at to existing databases that lack it
 ALTER TABLE bank_gjordatrans ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_bank_person_name ON bank_person (name);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_bank_konto_kontonr ON bank_konto (kontonr);

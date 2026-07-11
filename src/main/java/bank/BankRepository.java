@@ -69,41 +69,90 @@ public class BankRepository {
         } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
-    public double getSaldo(String kontonr) {
-        String sql = "SELECT saldo FROM konto WHERE kontonr = ?";
-        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, kontonr);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getDouble(1);
-                throw new BankException("Kontonummer finns inte!");
+    public void deposit(String kontonr, double belopp, String ocr) {
+        try (Connection c = connect()) {
+            c.setAutoCommit(false);
+            try {
+                addToSaldo(c, kontonr, belopp);
+                insertTransaction(c, kontonr, "ins", belopp, ocr);
+                c.commit();
+            } catch (SQLException | BankException e) {
+                c.rollback();
+                throw e;
             }
         } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
-    public void updateSaldo(String kontonr, double saldo) {
-        String sql = "UPDATE konto SET saldo = ? WHERE kontonr = ?";
-        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setDouble(1, saldo); ps.setString(2, kontonr);
-            ps.executeUpdate();
+    public void withdraw(String kontonr, double belopp, String ocr) {
+        try (Connection c = connect()) {
+            c.setAutoCommit(false);
+            try {
+                subtractIfSufficient(c, kontonr, belopp);
+                insertTransaction(c, kontonr, "utt", belopp, ocr);
+                c.commit();
+            } catch (SQLException | BankException e) {
+                c.rollback();
+                throw e;
+            }
         } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
 
-    public void insertTransaction(String kontonr, String typ, double belopp, String ocr) {
-        String sql = "INSERT INTO gjordatrans (kontonr, typ, belopp, OCRmeddelande) VALUES (?, ?, ?, ?)";
-        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
+    public void transfer(String from, String to, double belopp, String ocr) {
+        try (Connection c = connect()) {
+            c.setAutoCommit(false);
+            try {
+                subtractIfSufficient(c, from, belopp);
+                addToSaldo(c, to, belopp);
+                insertTransaction(c, from, "utt", belopp, ocr);
+                insertTransaction(c, to, "ins", belopp, ocr);
+                c.commit();
+            } catch (SQLException | BankException e) {
+                c.rollback();
+                throw e;
+            }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+    }
+
+    private void addToSaldo(Connection c, String kontonr, double belopp) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement(
+                "UPDATE konto SET saldo = saldo + ? WHERE kontonr = ?")) {
+            ps.setDouble(1, belopp); ps.setString(2, kontonr);
+            ps.executeUpdate();
+        }
+    }
+
+    private void subtractIfSufficient(Connection c, String kontonr, double belopp) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement(
+                "UPDATE konto SET saldo = saldo - ? WHERE kontonr = ? AND saldo >= ?")) {
+            ps.setDouble(1, belopp); ps.setString(2, kontonr); ps.setDouble(3, belopp);
+            if (ps.executeUpdate() == 0)
+                throw new BankException("Inte tillräckligt med pengar på kontot");
+        }
+    }
+
+    private void insertTransaction(Connection c, String kontonr, String typ, double belopp, String ocr) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO gjordatrans (kontonr, typ, belopp, OCRmeddelande) VALUES (?, ?, ?, ?)")) {
             ps.setString(1, kontonr); ps.setString(2, typ);
             ps.setDouble(3, belopp); ps.setString(4, ocr);
             ps.executeUpdate();
-        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+        }
     }
 
     public void deleteAccount(String kontonr) {
         try (Connection c = connect()) {
-            try (PreparedStatement ps = c.prepareStatement("DELETE FROM gjordatrans WHERE kontonr = ?")) {
-                ps.setString(1, kontonr); ps.executeUpdate();
-            }
-            try (PreparedStatement ps = c.prepareStatement("DELETE FROM konto WHERE kontonr = ?")) {
-                ps.setString(1, kontonr); ps.executeUpdate();
+            c.setAutoCommit(false);
+            try {
+                try (PreparedStatement ps = c.prepareStatement("DELETE FROM gjordatrans WHERE kontonr = ?")) {
+                    ps.setString(1, kontonr); ps.executeUpdate();
+                }
+                try (PreparedStatement ps = c.prepareStatement("DELETE FROM konto WHERE kontonr = ?")) {
+                    ps.setString(1, kontonr); ps.executeUpdate();
+                }
+                c.commit();
+            } catch (SQLException e) {
+                c.rollback();
+                throw e;
             }
         } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
     }
