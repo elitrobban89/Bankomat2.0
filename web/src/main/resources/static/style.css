@@ -379,6 +379,7 @@ body {
   justify-content: center;
   gap: 24px;
   align-items: center;
+  border-radius: 0 0 14px 14px;
 }
 
 .keypad-grid {
@@ -509,7 +510,6 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  border-radius: 0 0 14px 14px;
 }
 
 .cash-housing {
