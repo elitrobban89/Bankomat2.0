@@ -28,7 +28,7 @@
                 <a class="btn btn-secondary" th:href="@{/registervard/konton(namn=${p})}"
                    style="padding:5px 12px;font-size:10px;">Konton</a>
                 <form th:action="@{/registervard/ta-bort-person}" method="post"
-                      th:onsubmit="|return confirm('Ta bort ${p}?')|">
+                      onsubmit="return confirm('Ta bort ' + this.elements['name'].value + '?')">
                   <input type="hidden" name="name" th:value="${p}"/>
                   <button type="submit" class="btn btn-danger"
                           style="padding:5px 12px;font-size:10px;">Ta bort</button>
