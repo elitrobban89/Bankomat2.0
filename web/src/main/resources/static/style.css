@@ -1333,7 +1333,7 @@ body::before {
   box-shadow: 0 0 14px rgba(0,255,80,.3);
   z-index: 1;
   opacity: 0;
-  animation: card-insert 1.8s ease-in .2s forwards;
+  animation: card-insert 2.3s ease-in .2s forwards;
   pointer-events: none;
 }
 

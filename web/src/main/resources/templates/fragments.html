@@ -159,7 +159,7 @@
         setTimeout(function () {
           card.remove();
           outer.classList.remove('inserting');
-        }, 2300);
+        }, 2800);
       }
 
       // Intro en gång per session:
@@ -194,7 +194,7 @@
           boot.textContent = text.slice(0, i);
           if (i >= text.length) {
             clearInterval(typer);
-            setTimeout(showPrompt, 500);
+            setTimeout(showPrompt, 900);
           }
         }, 14);
 
@@ -209,6 +209,7 @@
             '<div class="prompt-sub">Weras Betalservice AB</div>';
           ov.appendChild(p);
           requestAnimationFrame(function () { p.classList.add('show'); });
+          // Låt SÄTT IN DITT KORT-skärmen synas i lugn och ro innan kortet kommer
           setTimeout(function () {
             insertCardAnim();
             setTimeout(function () {
@@ -218,9 +219,9 @@
               setTimeout(function () {
                 ov.classList.add('done');
                 setTimeout(function () { ov.remove(); }, 550);
-              }, 900);
-            }, 1900);
-          }, 1100);
+              }, 1300);
+            }, 2600);
+          }, 3200);
         }
       }
 
