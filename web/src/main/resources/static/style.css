@@ -177,20 +177,94 @@ body {
     0 0 30px rgba(0,255,80,.08);
   overflow: hidden;
   position: relative;
-  min-height: 440px;
+  height: 480px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* CRT scanline overlay */
+/* CRT scanlines + phosphor column mask */
 .atm-screen::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 2px,
-    rgba(0,0,0,.06) 2px, rgba(0,0,0,.06) 4px
-  );
+  background:
+    repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,.06) 2px, rgba(0,0,0,.06) 4px
+    ),
+    repeating-linear-gradient(
+      90deg, rgba(0,255,80,.02), rgba(0,255,80,.02) 1px,
+      transparent 1px, transparent 3px
+    );
   pointer-events: none;
   z-index: 50;
+}
+
+/* subtle CRT flicker */
+.atm-screen { animation: crt-flicker 6s infinite; }
+
+@keyframes crt-flicker {
+  0%, 91%, 100% { opacity: 1; }
+  92%           { opacity: .97; }
+  93%           { opacity: 1; }
+  96%           { opacity: .985; }
+}
+
+/* rolling refresh band + curvature vignette (injected by script) */
+.crt-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 51;
+  overflow: hidden;
+}
+
+.crt-overlay::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background: linear-gradient(180deg, transparent, rgba(0,255,120,.05), transparent);
+  animation: crt-band 7s linear infinite;
+}
+
+@keyframes crt-band {
+  0%   { top: -20%; }
+  100% { top: 115%; }
+}
+
+.crt-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 115% 100% at 50% 50%,
+    transparent 62%, rgba(0,0,0,.38) 100%
+  );
+}
+
+/* chromatic aberration on screen text (inherited) */
+.screen-main {
+  text-shadow: .6px 0 rgba(255,60,60,.14), -.6px 0 rgba(60,140,255,.14);
+}
+
+/* CRT power-on (once per session, class set by script) */
+.atm-screen.crt-on {
+  animation: crt-on 1s cubic-bezier(.23,1,.32,1) forwards;
+}
+
+@keyframes crt-on {
+  0%   { transform: scaleY(.005) scaleX(.65); filter: brightness(5) saturate(.4); }
+  35%  { transform: scaleY(.005) scaleX(1);   filter: brightness(5) saturate(.4); }
+  60%  { transform: scaleY(1)    scaleX(1);   filter: brightness(2.2); }
+  85%  { filter: brightness(.9); }
+  100% { transform: none; filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atm-screen, .atm-screen.crt-on, .crt-overlay::before,
+  .insert-card, .bill, .atm-brand { animation: none !important; }
 }
 
 /* green corner glow */
@@ -234,7 +308,17 @@ body {
   padding: 18px 16px;
   position: relative;
   z-index: 1;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #0a3018 transparent;
 }
+
+.screen-main::-webkit-scrollbar { width: 6px; }
+.screen-main::-webkit-scrollbar-thumb { background: #0a3018; border-radius: 3px; }
+.screen-main::-webkit-scrollbar-track { background: transparent; }
+
+.screen-bar { flex-shrink: 0; }
 
 /* blinking cursor on prompts */
 .cursor::after {
@@ -281,7 +365,7 @@ body {
   justify-content: center;
   user-select: none;
   transition: all .1s;
-  cursor: default;
+  cursor: pointer;
 }
 
 .num-key:hover {
@@ -289,6 +373,11 @@ body {
   border-color: var(--grn-dk);
   box-shadow: 0 0 8px rgba(0,255,80,.15), inset 0 0 8px rgba(0,255,80,.05);
   transform: translateY(-1px);
+}
+
+.num-key:active {
+  transform: translateY(1px);
+  border-bottom-width: 1px;
 }
 
 .special-keys {
@@ -309,9 +398,12 @@ body {
   align-items: center;
   justify-content: center;
   user-select: none;
-  cursor: default;
+  cursor: pointer;
   transition: all .1s;
 }
+
+.sp-key:hover { transform: translateY(-1px); filter: brightness(1.4); }
+.sp-key:active { transform: translateY(1px); }
 
 .sp-key.cancel {
   background: linear-gradient(180deg, #280808 0%, #1c0606 100%);
@@ -538,6 +630,45 @@ select:focus {
 }
 
 select option { background: #020802; }
+
+/* Quick amount buttons (uttag) */
+.quick-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.quick-amt {
+  background: linear-gradient(180deg, #0c1a0e 0%, #081008 100%);
+  border: 1px solid #1a3018;
+  border-bottom: 3px solid #020602;
+  border-radius: 4px;
+  color: #5aaa70;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 9px 0;
+  cursor: pointer;
+  transition: all .12s;
+}
+
+.quick-amt:hover {
+  color: var(--grn);
+  border-color: var(--grn-dk);
+  box-shadow: 0 0 10px rgba(0,255,80,.15);
+  transform: translateY(-1px);
+}
+
+.quick-amt:active { transform: translateY(1px); }
+
+.quick-amt.selected {
+  background: linear-gradient(180deg, #043a18 0%, #022810 100%);
+  border-color: var(--grn);
+  color: var(--grn);
+  text-shadow: 0 0 6px rgba(0,255,80,.4);
+  box-shadow: 0 0 12px rgba(0,255,80,.2), inset 0 0 8px rgba(0,255,80,.06);
+}
 
 /* Search row */
 .search-row { display: flex; gap: 8px; }
@@ -794,6 +925,104 @@ details.accordion > summary:hover { background: rgba(0,60,20,.2); }
 }
 
 /* ══════════════════════════════════════════
+   ANIMATIONS: card insert + cash dispense
+══════════════════════════════════════════ */
+.card-slot-outer { position: relative; }
+.card-slot-housing { position: relative; z-index: 2; }
+
+.insert-card {
+  position: absolute;
+  top: -58px;
+  left: 50%;
+  width: 104px;
+  height: 62px;
+  margin-left: -52px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0a3a1a 0%, #062610 60%, #041c0c 100%);
+  border: 1px solid #1a5a30;
+  box-shadow: 0 0 14px rgba(0,255,80,.3);
+  z-index: 1;
+  opacity: 0;
+  animation: card-insert 1.8s ease-in .2s forwards;
+  pointer-events: none;
+}
+
+/* chip + magnet stripe on the card */
+.insert-card::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 20px;
+  height: 14px;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #aad890, #5a9850);
+  opacity: .8;
+}
+
+.insert-card::after {
+  content: 'BANKOMAT 2.0';
+  position: absolute;
+  bottom: 7px;
+  left: 12px;
+  color: var(--grn);
+  font-size: 7px;
+  letter-spacing: 1px;
+  opacity: .8;
+}
+
+@keyframes card-insert {
+  0%   { transform: translateY(-14px); opacity: 0; }
+  18%  { transform: translateY(0);     opacity: 1; }
+  75%  { transform: translateY(46px);  opacity: 1; }
+  100% { transform: translateY(62px);  opacity: 0; }
+}
+
+.card-slot-outer.inserting .card-slot-slit {
+  background: var(--grn-dk);
+  box-shadow: 0 0 10px rgba(0,255,80,.5);
+  transition: all .3s;
+}
+
+.atm-cash-slot { position: relative; }
+
+.cash-housing.dispensing {
+  border-color: var(--grn-dk);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.95), 0 0 16px rgba(0,255,80,.4);
+  transition: all .2s;
+}
+
+.bill {
+  position: absolute;
+  top: 16px;
+  width: 46px;
+  height: 22px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #0d4d20 0%, #073012 100%);
+  border: 1px solid #2a8a4a;
+  box-shadow: 0 0 10px rgba(0,255,80,.35);
+  color: var(--grn);
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  pointer-events: none;
+  animation: bill-fall 1.9s ease-in forwards;
+}
+
+@keyframes bill-fall {
+  0%   { transform: translateY(-6px) rotate(0deg); opacity: 0; }
+  12%  { transform: translateY(4px)  rotate(0deg); opacity: 1; }
+  100% {
+    transform: translateY(170px) translateX(var(--drift, 0px)) rotate(var(--spin, 20deg));
+    opacity: 0;
+  }
+}
+
+/* ══════════════════════════════════════════
    RESPONSIVE / MOBILE
 ══════════════════════════════════════════ */
 @media (max-width: 580px) {
@@ -814,10 +1043,11 @@ details.accordion > summary:hover { background: rgba(0,60,20,.2); }
     border-radius: 0;
     border-left: none;
     border-right: none;
-    min-height: 0;
+    height: auto;
+    display: block;
   }
 
-  .screen-main { padding: 14px 12px; }
+  .screen-main { padding: 14px 12px; overflow: visible; }
   .atm-keypad-section { display: none; }
   .atm-cash-slot { border-radius: 0; }
 

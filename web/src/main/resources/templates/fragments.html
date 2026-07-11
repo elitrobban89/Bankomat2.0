@@ -58,7 +58,7 @@
       <div class="num-key">*</div><div class="num-key">0</div><div class="num-key">#</div>
     </div>
     <div class="special-keys">
-      <div class="sp-key cancel">AVBRYT</div>
+      <div class="sp-key cancel" th:attr="data-href=@{/}">AVBRYT</div>
       <div class="sp-key clear">RENSA</div>
       <div class="sp-key enter">OK ▶</div>
     </div>
@@ -80,12 +80,153 @@
       tick();
       setInterval(tick, 15000);
 
+      // Skala hela bankomaten så att den får plats i fönstrets höjd
+      function fitAtm() {
+        var m = document.querySelector('.atm-machine');
+        if (!m) return;
+        m.style.zoom = '';
+        if (window.innerWidth <= 580) return;
+        var scale = (window.innerHeight - 30) / m.offsetHeight;
+        if (scale < 1) m.style.zoom = scale;
+      }
+      window.addEventListener('resize', fitAtm);
+      window.addEventListener('load', fitAtm);
+
+      // CRT: rullande band + vinjett-overlay, samt power-on en gång per session
+      function crtSetup() {
+        var screen = document.querySelector('.atm-screen');
+        if (!screen) return;
+        var ov = document.createElement('div');
+        ov.className = 'crt-overlay';
+        screen.appendChild(ov);
+        try {
+          if (sessionStorage.getItem('atmPowerOn')) return;
+          sessionStorage.setItem('atmPowerOn', '1');
+        } catch (e) { return; }
+        screen.classList.add('crt-on');
+        setTimeout(function () { screen.classList.remove('crt-on'); }, 1100);
+      }
+
+      // Kortet glider in i kortläsaren (en gång per session)
+      function cardIntro() {
+        try {
+          if (sessionStorage.getItem('atmCardInserted')) return;
+          sessionStorage.setItem('atmCardInserted', '1');
+        } catch (e) { return; }
+        var outer = document.querySelector('.card-slot-outer');
+        if (!outer) return;
+        var card = document.createElement('div');
+        card.className = 'insert-card';
+        outer.appendChild(card);
+        outer.classList.add('inserting');
+        setTimeout(function () {
+          card.remove();
+          outer.classList.remove('inserting');
+        }, 2300);
+      }
+
+      // Sedlar ramlar ur uttagsfacket efter ett lyckat uttag
+      function dispenseCash() {
+        var alertEl = document.querySelector('.alert-success');
+        if (!alertEl || alertEl.textContent.indexOf('Uttag') === -1) return;
+        var slot = document.querySelector('.atm-cash-slot');
+        if (!slot) return;
+        var housing = slot.querySelector('.cash-housing');
+        if (housing) housing.classList.add('dispensing');
+        var bills = 7;
+        for (var i = 0; i < bills; i++) {
+          (function (i) {
+            setTimeout(function () {
+              var b = document.createElement('div');
+              b.className = 'bill';
+              b.textContent = 'KR';
+              b.style.left = 'calc(50% + ' + Math.round(Math.random() * 120 - 60) + 'px)';
+              b.style.setProperty('--drift', Math.round(Math.random() * 60 - 30) + 'px');
+              b.style.setProperty('--spin', Math.round(Math.random() * 70 - 35) + 'deg');
+              slot.appendChild(b);
+              setTimeout(function () { b.remove(); }, 2000);
+            }, i * 170);
+          })(i);
+        }
+        setTimeout(function () {
+          if (housing) housing.classList.remove('dispensing');
+        }, bills * 170 + 1200);
+      }
+
       document.addEventListener('DOMContentLoaded', function () {
+        fitAtm();
+        crtSetup();
+        cardIntro();
+        dispenseCash();
+
         document.querySelectorAll('form').forEach(function (f) {
           f.addEventListener('submit', function () {
             var ov = document.getElementById('loading-overlay');
             if (ov) ov.classList.add('show');
           });
+        });
+
+        // Snabbvalsknappar: fyll i beloppet i samma formulär
+        document.querySelectorAll('.quick-amt').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var form = b.closest('form');
+            if (!form) return;
+            var inp = form.querySelector('input[name="belopp"]');
+            if (!inp) return;
+            inp.value = b.getAttribute('data-amt');
+            form.querySelectorAll('.quick-amt').forEach(function (x) {
+              x.classList.remove('selected');
+            });
+            b.classList.add('selected');
+            inp.focus();
+          });
+        });
+
+        // Knappsatsen skriver i det senast fokuserade fältet på skärmen
+        var activeInput = null;
+        document.addEventListener('focusin', function (e) {
+          var t = e.target;
+          if (t && t.tagName === 'INPUT' && t.closest('.screen-main')) activeInput = t;
+        });
+
+        function keypadTarget() {
+          if (activeInput && document.contains(activeInput) && activeInput.offsetParent !== null) {
+            return activeInput;
+          }
+          return document.querySelector('.screen-main details[open] input[name="belopp"]')
+              || document.querySelector('.screen-main input[type="text"]');
+        }
+
+        document.querySelectorAll('.num-key').forEach(function (k) {
+          k.addEventListener('click', function () {
+            var inp = keypadTarget();
+            if (!inp) return;
+            var ch = k.textContent.trim();
+            if (ch === '#') inp.value = inp.value.slice(0, -1);      // backsteg
+            else if (ch === '*') inp.value += ',';                    // decimalkomma
+            else inp.value += ch;
+            inp.focus();
+            activeInput = inp;
+          });
+        });
+
+        var clearKey = document.querySelector('.sp-key.clear');
+        if (clearKey) clearKey.addEventListener('click', function () {
+          var inp = keypadTarget();
+          if (inp) { inp.value = ''; inp.focus(); }
+        });
+
+        var enterKey = document.querySelector('.sp-key.enter');
+        if (enterKey) enterKey.addEventListener('click', function () {
+          var inp = keypadTarget();
+          if (!inp || !inp.form) return;
+          if (inp.form.requestSubmit) inp.form.requestSubmit();
+          else inp.form.submit();
+        });
+
+        var cancelKey = document.querySelector('.sp-key.cancel');
+        if (cancelKey) cancelKey.addEventListener('click', function () {
+          window.location.href = cancelKey.getAttribute('data-href') || '/';
         });
       });
     })();

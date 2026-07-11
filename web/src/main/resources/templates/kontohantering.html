@@ -67,7 +67,18 @@
                 <form th:action="@{/kontohantering/uttag}" method="post">
                   <input type="hidden" name="kontonr" th:value="${konto.kontonr}"/>
                   <div class="form-group">
-                    <label>Belopp (kr)</label>
+                    <label>Snabbval</label>
+                    <div class="quick-amounts">
+                      <button type="button" class="quick-amt" data-amt="100">100 kr</button>
+                      <button type="button" class="quick-amt" data-amt="200">200 kr</button>
+                      <button type="button" class="quick-amt" data-amt="500">500 kr</button>
+                      <button type="button" class="quick-amt" data-amt="1000">1 000 kr</button>
+                      <button type="button" class="quick-amt" data-amt="2000">2 000 kr</button>
+                      <button type="button" class="quick-amt" data-amt="5000">5 000 kr</button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Belopp (kr) <span class="hint">(eller använd knappsatsen nedan)</span></label>
                     <input type="text" name="belopp" placeholder="0.00" required/>
                   </div>
                   <div class="form-group">
