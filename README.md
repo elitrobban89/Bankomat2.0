@@ -16,11 +16,12 @@ Ett internt bankhanteringssystem med två versioner:
 **Kontohantering**
 - Söka upp konto med kontonummer
 - Sätta in pengar
-- Ta ut pengar
+- Ta ut pengar (med snabbvalsknappar 100–5 000 kr i webbversionen)
 - Överföra pengar mellan konton
 - Visa scrollbar transaktionshistorik
 - Saldo uppdateras automatiskt efter varje transaktion
 - Ta bort konto (alla tillhörande transaktioner tas också bort)
+- Alla penningtransaktioner körs atomärt i databastransaktioner
 
 ## Fönsterhantering
 
@@ -50,14 +51,31 @@ Ett internt bankhanteringssystem med två versioner:
 
 ## Webbdesign
 
-Webbversionen är designad som en riktig bankomat:
+Webbversionen är designad som en riktig bankomat, med interaktiv "hårdvara":
 
-- **Mörk ATM-kropp** med kortläsare, sifferblock och uttagsfack
-- **Neongrön fosforskärm** med CRT-scanlines och glow-effekter
-- **Terminal-typsnitt** (Share Tech Mono) för autentisk känsla
-- **Flimmeranimation** på loggan och pulserande hover-effekter
-- **Laddningsindikator** visas vid alla formulärinskickningar
-- **Mobilanpassad** — sidobchottar och knappsats döljs på små skärmar
+**Maskinen**
+- **Mörk ATM-kropp** med glödande kortläsare, kvittoskrivare, statuslampa,
+  borstad stålknappsats (med taktil punkt på 5:an) och uttagsfack ovanför knappsatsen
+- **Knappsatsen fungerar** — siffrorna skriver i fokuserat fält, `*` ger decimalkomma,
+  `#` är backsteg, RENSA tömmer, OK skickar formuläret och AVBRYT går till menyn
+- **Statuslampan "I DRIFT"** pulserar grönt och blinkar gult "BEARBETAR" under transaktioner
+- Hela maskinen skalas automatiskt så att den får plats i fönstrets höjd
+
+**Introsekvens** (en gång per session, som en riktig Bankomat)
+1. CRT power-on-svep och BIOS-självtest som skrivs ut rad för rad
+2. "SÄTT IN DITT KORT" med kortikon och studsande pil
+3. Kortet glider in i den glödande kortläsaren
+4. "LÄSER KORT" → menyn tonas fram
+
+**Animationer och effekter**
+- **Sedlar ramlar ur uttagsfacket** efter varje lyckat uttag
+- **Kvitto skrivs ut** ur kvittofacket efter insättning/uttag/överföring och rivs av
+- **Neongrön fosforskärm** med CRT-scanlines, fosformask, rullande refresh-band,
+  vinjettering, subtilt flimmer och kromatisk aberration
+- **Matrix-regn** och pulserande glöd bakom maskinen
+- Saldot räknas upp från 0, meddelanden glitchar in, felsidans text glitchar
+- Alla effekter respekterar `prefers-reduced-motion`
+- **Mobilanpassad** — sidoknappar och knappsats döljs på små skärmar
 
 ## Arkitektur
 
@@ -104,12 +122,14 @@ java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.7.15-M1.jar" bank.Meny
 min_labb3/
 ├── web/                                   # Webbversion (Spring Boot)
 │   ├── pom.xml
-│   └── src/main/
-│       ├── java/bank/                     # Controller, Service, Repository
-│       └── resources/
-│           ├── templates/                 # Thymeleaf HTML-sidor
-│           ├── static/style.css
-│           └── application*.properties
+│   └── src/
+│       ├── main/
+│       │   ├── java/bank/                 # Controller, Service, Repository
+│       │   └── resources/
+│       │       ├── templates/             # Thymeleaf HTML-sidor
+│       │       ├── static/style.css
+│       │       └── application*.properties
+│       └── test/java/bank/                # BankServiceTest, BankControllerTest
 ├── Dockerfile                             # Docker-bygge för Render
 ├── render.yaml                            # Render-konfiguration
 ├── src/                                   # Skrivbordsversion (Swing)
@@ -148,6 +168,21 @@ Databasen innehåller Looney Tunes-karaktärer som testdata:
 
 - Kontonummer måste vara minst 5 siffror
 - Kontotyp måste vara `spar` eller `loen`
-- Maxbelopp per transaktion: 20 000 kr
+- Belopp måste vara större än 0 kr; maxbelopp per transaktion: 20 000 kr
+- Uttag och överföringar kräver täckning på kontot (kontrolleras atomärt i databasen)
+- Överföring till samma konto är inte tillåten
 - Kontoinnehavaren måste finnas registrerad innan ett konto skapas
 - En kontoinnehavare kan inte tas bort om aktiva konton finns
+- Personnamn och kontonummer är unika (unika index i webbversionens databas)
+
+## Tester
+
+Webbversionen har en testsvit med 23 tester (JUnit 5 + Mockito + MockMvc):
+
+- `BankServiceTest` — validering och affärslogik (belopp, kontonummer, täckning m.m.)
+- `BankControllerTest` — sidrendering, inklusive regressionstest för Thymeleaf-mallarna
+
+```bash
+cd web
+mvn test
+```
