@@ -68,7 +68,8 @@ Webbversionen är designad som en riktig bankomat, med interaktiv "hårdvara":
 4. "LÄSER KORT" → menyn tonas fram
 
 **Animationer och effekter**
-- **Sedlar ramlar ur uttagsfacket** efter varje lyckat uttag
+- **Uttagsanimation** — luckan öppnas, en sedelbunt matas upp ur uttagsfacket och tas
+  (lösa sedlar fladdrar); på mobil scrollas uttagsfacket automatiskt fram
 - **Kvitto skrivs ut** ur kvittofacket efter insättning/uttag/överföring och rivs av
 - **Neongrön fosforskärm** med CRT-scanlines, fosformask, rullande refresh-band,
   vinjettering, subtilt flimmer och kromatisk aberration
