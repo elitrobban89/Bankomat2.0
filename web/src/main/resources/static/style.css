@@ -514,7 +514,7 @@ body {
 
 .cash-housing {
   width: 260px;
-  height: 20px;
+  height: 22px;
   background: #010301;
   border: 2px solid #122012;
   border-radius: 3px;
@@ -522,6 +522,94 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: inset 0 2px 6px rgba(0,0,0,.95);
+  position: relative;
+  perspective: 240px;
+}
+
+/* luckan som öppnas vid uttag */
+.cash-flap {
+  position: absolute;
+  inset: -2px;
+  z-index: 3;
+  background: linear-gradient(180deg, #0d160e 0%, #060c07 100%);
+  border: 2px solid #122012;
+  border-radius: 3px;
+  transform-origin: 50% 100%;
+  transition: transform .55s cubic-bezier(.4, 0, .2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cash-flap::after {
+  content: '';
+  width: 200px;
+  height: 3px;
+  background: #000;
+  border-radius: 1px;
+}
+
+.cash-housing.open .cash-flap {
+  transform: rotateX(-74deg);
+  box-shadow: 0 6px 10px rgba(0,0,0,.6);
+}
+
+/* sedelbunten som matas upp ur facket */
+.cash-stack-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 48px;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cash-stack {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 156px;
+  height: 32px;
+  margin-left: -78px;
+  transform: translateY(108%);
+  transition: transform .9s cubic-bezier(.25, 1.15, .4, 1);
+  background: repeating-linear-gradient(0deg, #0f6a2c 0 2px, #073d16 2px 4px);
+  border: 1px solid #26a04c;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  box-shadow:
+    0 -2px 16px rgba(0,255,127,.4),
+    inset 0 1px 0 rgba(255,255,255,.25),
+    inset -6px 0 8px rgba(0,0,0,.35);
+}
+
+/* översta sedeln i bunten */
+.cash-stack::after {
+  content: '· 500 KR ·';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 13px;
+  background: linear-gradient(180deg, #12813a, #0d5f28);
+  color: #bfffd0;
+  font-size: 7px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+  line-height: 13px;
+  border-bottom: 1px solid #063018;
+  border-radius: 2px 2px 0 0;
+}
+
+.cash-stack.up { transform: translateY(0); }
+
+.cash-stack.taken {
+  transform: translateY(-80px) rotate(-3deg);
+  opacity: 0;
+  transition: transform .5s ease-in, opacity .5s ease-in;
 }
 
 .cash-slit {

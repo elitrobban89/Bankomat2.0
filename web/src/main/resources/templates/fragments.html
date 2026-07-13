@@ -294,7 +294,8 @@
         });
       }
 
-      // Sedlar ramlar ur uttagsfacket efter ett lyckat uttag
+      // Uttag: luckan öppnas, en staplad sedelbunt matas upp,
+      // tas efter en stund (några lösa sedlar fladdrar) och luckan stängs
       function dispenseCash() {
         if (reduceMotion) return;
         var alertEl = document.querySelector('.alert-success');
@@ -302,25 +303,42 @@
         var slot = document.querySelector('.atm-cash-slot');
         if (!slot) return;
         var housing = slot.querySelector('.cash-housing');
-        if (housing) housing.classList.add('dispensing');
-        var bills = 7;
-        for (var i = 0; i < bills; i++) {
-          (function (i) {
-            setTimeout(function () {
-              var b = document.createElement('div');
-              b.className = 'bill';
-              b.textContent = 'KR';
-              b.style.left = 'calc(50% + ' + Math.round(Math.random() * 120 - 60) + 'px)';
-              b.style.setProperty('--drift', Math.round(Math.random() * 60 - 30) + 'px');
-              b.style.setProperty('--spin', Math.round(Math.random() * 70 - 35) + 'deg');
-              slot.appendChild(b);
-              setTimeout(function () { b.remove(); }, 2000);
-            }, i * 170);
-          })(i);
+        if (!housing) return;
+
+        var wrap = document.createElement('div');
+        wrap.className = 'cash-stack-wrap';
+        var stack = document.createElement('div');
+        stack.className = 'cash-stack';
+        wrap.appendChild(stack);
+        var flap = document.createElement('div');
+        flap.className = 'cash-flap';
+        housing.appendChild(wrap);
+        housing.appendChild(flap);
+        housing.classList.add('dispensing');
+
+        function looseBill() {
+          var b = document.createElement('div');
+          b.className = 'bill';
+          b.textContent = 'KR';
+          b.style.left = 'calc(50% + ' + Math.round(Math.random() * 100 - 50) + 'px)';
+          b.style.setProperty('--drift', Math.round(Math.random() * 60 - 30) + 'px');
+          b.style.setProperty('--spin', Math.round(Math.random() * 70 - 35) + 'deg');
+          slot.appendChild(b);
+          setTimeout(function () { b.remove(); }, 2000);
         }
+
+        setTimeout(function () { housing.classList.add('open'); }, 300);
+        setTimeout(function () { stack.classList.add('up'); }, 950);
         setTimeout(function () {
-          if (housing) housing.classList.remove('dispensing');
-        }, bills * 170 + 1200);
+          stack.classList.add('taken');
+          for (var i = 0; i < 4; i++) setTimeout(looseBill, i * 150);
+        }, 4400);
+        setTimeout(function () { housing.classList.remove('open'); }, 5200);
+        setTimeout(function () {
+          housing.classList.remove('dispensing');
+          wrap.remove();
+          flap.remove();
+        }, 5900);
       }
 
       document.addEventListener('DOMContentLoaded', function () {
