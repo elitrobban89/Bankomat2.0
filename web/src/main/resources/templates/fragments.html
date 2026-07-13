@@ -316,6 +316,12 @@
         housing.appendChild(flap);
         housing.classList.add('dispensing');
 
+        // På mobil hamnar uttagsfacket under skärmkanten – scrolla fram det
+        var rect = slot.getBoundingClientRect();
+        if (rect.bottom > window.innerHeight || rect.top < 0) {
+          slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
         function looseBill() {
           var b = document.createElement('div');
           b.className = 'bill';
