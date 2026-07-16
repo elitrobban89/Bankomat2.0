@@ -1,12 +1,15 @@
 package bank;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BankRepository {
 
     private static final String DB_URL = "jdbc:sqlite:werasbetal.db";
+    private static final DateTimeFormatter SQLITE_TS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     static {
         try {
@@ -14,12 +17,43 @@ public class BankRepository {
             try (Connection c = DriverManager.getConnection(DB_URL); Statement st = c.createStatement()) {
                 st.execute("CREATE TABLE IF NOT EXISTS person (name VARCHAR(50), gatuadress VARCHAR(50), postnr CHAR(5), stad VARCHAR(50))");
                 st.execute("CREATE TABLE IF NOT EXISTS konto (kontonr CHAR(13), kontotyp VARCHAR(10), namn VARCHAR(50), saldo DOUBLE)");
-                st.execute("CREATE TABLE IF NOT EXISTS gjordatrans (kontonr CHAR(13), typ CHAR(3), belopp DOUBLE, OCRmeddelande VARCHAR(70))");
+                st.execute("CREATE TABLE IF NOT EXISTS gjordatrans (kontonr CHAR(13), typ CHAR(3), belopp DOUBLE, OCRmeddelande VARCHAR(70), created_at TIMESTAMP)");
+                addCreatedAtIfMissing(c, st);
+                createUniqueIndexes(st);
             }
         } catch (ClassNotFoundException e) {
             throw new ExceptionInInitializerError("SQLite JDBC driver not found: " + e.getMessage());
         } catch (SQLException e) {
             throw new ExceptionInInitializerError("Kunde inte initiera databasen: " + e.getMessage());
+        }
+    }
+
+    /** Lägger till created_at i befintliga databaser som saknar kolumnen. */
+    private static void addCreatedAtIfMissing(Connection c, Statement st) throws SQLException {
+        boolean hasCreatedAt = false;
+        try (ResultSet rs = st.executeQuery("PRAGMA table_info(gjordatrans)")) {
+            while (rs.next()) {
+                if ("created_at".equalsIgnoreCase(rs.getString("name"))) {
+                    hasCreatedAt = true;
+                    break;
+                }
+            }
+        }
+        if (!hasCreatedAt) {
+            try (Statement alter = c.createStatement()) {
+                alter.execute("ALTER TABLE gjordatrans ADD COLUMN created_at TIMESTAMP");
+            }
+        }
+    }
+
+    /** Samma unika index som webbversionens schema. Misslyckas skapandet
+     *  (t.ex. gamla dubbletter i databasen) fortsätter appen utan index. */
+    private static void createUniqueIndexes(Statement st) {
+        try {
+            st.execute("CREATE UNIQUE INDEX IF NOT EXISTS ux_person_name ON person (name)");
+            st.execute("CREATE UNIQUE INDEX IF NOT EXISTS ux_konto_kontonr ON konto (kontonr)");
+        } catch (SQLException e) {
+            System.err.println("Varning: kunde inte skapa unika index: " + e.getMessage());
         }
     }
 
@@ -132,7 +166,8 @@ public class BankRepository {
 
     private void insertTransaction(Connection c, String kontonr, String typ, double belopp, String ocr) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO gjordatrans (kontonr, typ, belopp, OCRmeddelande) VALUES (?, ?, ?, ?)")) {
+                "INSERT INTO gjordatrans (kontonr, typ, belopp, OCRmeddelande, created_at) " +
+                "VALUES (?, ?, ?, ?, datetime('now', 'localtime'))")) {
             ps.setString(1, kontonr); ps.setString(2, typ);
             ps.setDouble(3, belopp); ps.setString(4, ocr);
             ps.executeUpdate();
@@ -175,36 +210,77 @@ public class BankRepository {
         return result;
     }
 
-    public List<String> getKontoInfo(String kontonr) {
+    public KontoInfo getKontoDetails(String kontonr) {
         String sql = "SELECT kontonr, kontotyp, namn, saldo FROM konto WHERE kontonr = ?";
-        List<String> result = new ArrayList<>();
+        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, kontonr);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return readKonto(rs);
+                return null;
+            }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+    }
+
+    public List<KontoInfo> getAccountsByPerson(String namn) {
+        String sql = "SELECT kontonr, kontotyp, namn, saldo FROM konto WHERE namn = ? ORDER BY kontonr";
+        List<KontoInfo> result = new ArrayList<>();
+        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, namn);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) result.add(readKonto(rs));
+            }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+        return result;
+    }
+
+    public List<KontoInfo> getAllAccounts() {
+        String sql = "SELECT kontonr, kontotyp, namn, saldo FROM konto ORDER BY namn, kontonr";
+        List<KontoInfo> result = new ArrayList<>();
+        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) result.add(readKonto(rs));
+            }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+        return result;
+    }
+
+    public double getTotalSaldo(String namn) {
+        String sql = "SELECT COALESCE(SUM(saldo), 0) FROM konto WHERE namn = ?";
+        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, namn);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getDouble(1) : 0.0;
+            }
+        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
+    }
+
+    public List<TransactionInfo> getTransactions(String kontonr) {
+        String sql = "SELECT typ, belopp, OCRmeddelande, created_at FROM gjordatrans WHERE kontonr = ? ORDER BY rowid DESC";
+        List<TransactionInfo> result = new ArrayList<>();
         try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, kontonr);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    String typ = "spar".equals(rs.getString(2)) ? "Sparkonto" : "Lönekonto";
-                    result.add(String.format(
-                        "Kontonummer:  %s%nTyp:          %s%nÄgare:        %s%nSaldo:        %.2f kr",
-                        rs.getString(1), typ, rs.getString(3), rs.getDouble(4)));
+                    result.add(new TransactionInfo(
+                        rs.getString(1), rs.getDouble(2), rs.getString(3),
+                        parseTimestamp(rs.getString(4))));
                 }
             }
         } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
         return result;
     }
 
-    public List<String> getTransactions(String kontonr) {
-        String sql = "SELECT typ, belopp, OCRmeddelande FROM gjordatrans WHERE kontonr = ?";
-        List<String> result = new ArrayList<>();
-        try (Connection c = connect(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, kontonr);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    String typ = "ins".equals(rs.getString(1)) ? "Insättning" : "Uttag     ";
-                    result.add(String.format("%-10s  %9.2f kr  –  %s",
-                        typ, rs.getDouble(2), rs.getString(3)));
-                }
-            }
-        } catch (SQLException e) { throw new BankException("Databasfel: " + e.getMessage()); }
-        return result;
+    private static KontoInfo readKonto(ResultSet rs) throws SQLException {
+        return new KontoInfo(rs.getString(1), rs.getString(2), rs.getString(3), rs.getDouble(4));
+    }
+
+    /** Transaktioner från före uppgraderingen saknar tidsstämpel — då returneras null. */
+    private static LocalDateTime parseTimestamp(String value) {
+        if (value == null || value.isEmpty()) return null;
+        try {
+            return LocalDateTime.parse(value, SQLITE_TS);
+        } catch (java.time.format.DateTimeParseException e) {
+            return null;
+        }
     }
 }

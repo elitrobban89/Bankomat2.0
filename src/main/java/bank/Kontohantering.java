@@ -151,8 +151,7 @@ public class Kontohantering extends JFrame {
     private void sökKonto(ActionEvent evt) {
         String kontonr = txtKonto.getText();
         try {
-            List<String> kontoInfo = bankService.getKontoInfo(kontonr);
-            infoArea.setText(String.join("\n", kontoInfo));
+            infoArea.setText(formatKonto(bankService.getKontoDetails(kontonr)));
             aktivtKonto = kontonr;
             setTransactionButtonsEnabled(true);
         } catch (BankException e) {
@@ -166,23 +165,37 @@ public class Kontohantering extends JFrame {
     private void refreshKonto() {
         if (aktivtKonto == null) return;
         try {
-            List<String> kontoInfo = bankService.getKontoInfo(aktivtKonto);
-            infoArea.setText(String.join("\n", kontoInfo));
+            infoArea.setText(formatKonto(bankService.getKontoDetails(aktivtKonto)));
         } catch (BankException ignored) {}
     }
 
+    private static String formatKonto(KontoInfo konto) {
+        return String.format(
+            "Kontonummer:  %s%nTyp:          %s%nÄgare:        %s%nSaldo:        %.2f kr",
+            konto.kontonr(), konto.kontotypDisplay(), konto.namn(), konto.saldo());
+    }
+
     private void visaTransaktioner() {
-        List<String> trans = bankService.getTransactions(aktivtKonto);
+        List<TransactionInfo> trans = bankService.getTransactions(aktivtKonto);
 
         JDialog dialog = new JDialog(this, "Transaktioner – konto " + aktivtKonto, true);
-        dialog.setSize(520, 380);
+        dialog.setSize(560, 380);
         dialog.setLocationRelativeTo(this);
 
         JTextArea area = new JTextArea();
         area.setEditable(false);
         area.setFont(new Font("Monospaced", Font.PLAIN, 13));
         area.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
-        area.setText(trans.isEmpty() ? "Inga transaktioner hittades." : String.join("\n", trans));
+        if (trans.isEmpty()) {
+            area.setText("Inga transaktioner hittades.");
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (TransactionInfo t : trans) {
+                sb.append(String.format("%-16s  %-10s  %9.2f kr  –  %s%n",
+                    t.datumDisplay(), t.typDisplay(), t.belopp(), t.ocr()));
+            }
+            area.setText(sb.toString());
+        }
 
         JButton btnStäng = UITheme.secondaryButton("Stäng");
         btnStäng.addActionListener(e -> dialog.dispose());

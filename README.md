@@ -7,21 +7,29 @@ Ett internt bankhanteringssystem med två versioner:
 
 ## Funktioner
 
+Båda versionerna har samma funktionsuppsättning och ett nästan identiskt service-lager.
+
 **Registervård**
 - Registrera nya kontoinnehavare
 - Skapa nya konton (sparkonto eller lönekonto)
 - Visa lista över alla kontoinnehavare
+- Visa en persons alla konton med totalt saldo
 - Ta bort kontoinnehavare (kräver att inga aktiva konton finns)
+
+**Kontoöversikt**
+- Lista över alla konton i banken (webbversionen: egen sida; skrivbordsversionen: tabell med totalsumma)
 
 **Kontohantering**
 - Söka upp konto med kontonummer
 - Sätta in pengar
 - Ta ut pengar (med snabbvalsknappar 100–5 000 kr i webbversionen)
 - Överföra pengar mellan konton
-- Visa scrollbar transaktionshistorik
+- Visa scrollbar transaktionshistorik med datum och tid
+- Belopp kan skrivas med decimalkomma eller decimalpunkt (100,50 eller 100.50)
 - Saldo uppdateras automatiskt efter varje transaktion
 - Ta bort konto (alla tillhörande transaktioner tas också bort)
 - Alla penningtransaktioner körs atomärt i databastransaktioner
+- Unika index på personnamn och kontonummer i båda databaserna
 
 ## Fönsterhantering
 
@@ -37,7 +45,7 @@ Ett internt bankhanteringssystem med två versioner:
 | GUI | Java Swing |
 | Databas | SQLite |
 | JDBC-driver | sqlite-jdbc 3.7.15 |
-| Java-version | Java 8+ |
+| Java-version | Java 17+ |
 
 **Webbversion**
 
@@ -100,7 +108,7 @@ Datalager         BankRepository — SQL-frågor med PreparedStatement
 
 ### Krav
 
-- Java 8 eller senare
+- Java 17 eller senare (koden använder records)
 
 ### Kör med JAR (enklaste sättet)
 
@@ -140,11 +148,14 @@ min_labb3/
 │               ├── Meny.java              # Startpunkt — huvudmeny
 │               ├── Val.java               # Undermeny för registervård
 │               ├── Kontohantering.java    # Kontosökning och transaktioner
+│               ├── KontoversiktDialog.java# Tabell över alla konton med totalsumma
 │               ├── NyPersonForm.java      # Formulär för ny kontoinnehavare
 │               ├── NyttKontoForm.java     # Formulär för nytt konto
 │               ├── TransaktionDialog.java # Dialog för insättning, uttag och överföring
-│               ├── PersonListDialog.java  # Lista och ta bort kontoinnehavare
+│               ├── PersonListDialog.java  # Lista, visa konton och ta bort kontoinnehavare
 │               ├── UITheme.java           # Gemensam styling (färger, knappar, kort)
+│               ├── KontoInfo.java         # Typad kontomodell (delas med webbversionen)
+│               ├── TransactionInfo.java   # Typad transaktionsmodell med tidsstämpel
 │               ├── BankService.java       # Affärslogik och validering
 │               ├── BankRepository.java    # Databasåtkomst
 │               └── BankException.java     # Felhantering mellan lagren

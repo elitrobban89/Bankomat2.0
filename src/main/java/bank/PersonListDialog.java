@@ -36,13 +36,16 @@ public class PersonListDialog extends JDialog {
         center.add(scroll, BorderLayout.CENTER);
         root.add(center, BorderLayout.CENTER);
 
-        JPanel btnPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        JPanel btnPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         btnPanel.setBackground(UITheme.BG);
         btnPanel.setBorder(BorderFactory.createEmptyBorder(14, 28, 20, 28));
+        JButton btnKonton = UITheme.primaryButton("Visa konton");
         JButton btnTaBort = UITheme.primaryButton("Ta bort vald");
         JButton btnStäng  = UITheme.secondaryButton("Stäng");
+        btnKonton.addActionListener(e -> visaKonton());
         btnTaBort.addActionListener(e -> taBort());
         btnStäng.addActionListener(e -> dispose());
+        btnPanel.add(btnKonton);
         btnPanel.add(btnTaBort);
         btnPanel.add(btnStäng);
         root.add(btnPanel, BorderLayout.SOUTH);
@@ -56,6 +59,48 @@ public class PersonListDialog extends JDialog {
         if (listModel.isEmpty()) {
             listModel.addElement("(Inga kontoinnehavare registrerade)");
         }
+    }
+
+    private void visaKonton() {
+        String vald = personList.getSelectedValue();
+        if (vald == null || vald.startsWith("(")) {
+            JOptionPane.showMessageDialog(this, "Välj en kontoinnehavare först.");
+            return;
+        }
+
+        java.util.List<KontoInfo> konton = bankService.getAccountsByPerson(vald);
+
+        JDialog dialog = new JDialog(this, "Konton – " + vald, true);
+        dialog.setSize(480, 340);
+        dialog.setLocationRelativeTo(this);
+
+        JTextArea area = new JTextArea();
+        area.setEditable(false);
+        area.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        area.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
+        if (konton.isEmpty()) {
+            area.setText("Inga konton registrerade för " + vald + ".");
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (KontoInfo k : konton) {
+                sb.append(String.format("%-14s  %-10s  %12.2f kr%n",
+                    k.kontonr(), k.kontotypDisplay(), k.saldo()));
+            }
+            sb.append(String.format("%n%-26s  %12.2f kr",
+                "Totalt saldo:", bankService.getTotalSaldo(vald)));
+            area.setText(sb.toString());
+        }
+
+        JButton btnStängKonton = UITheme.secondaryButton("Stäng");
+        btnStängKonton.addActionListener(e -> dialog.dispose());
+        JPanel btnPanel = new JPanel();
+        btnPanel.setBackground(UITheme.BG);
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 14, 0));
+        btnPanel.add(btnStängKonton);
+
+        dialog.add(new JScrollPane(area), BorderLayout.CENTER);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+        dialog.setVisible(true);
     }
 
     private void taBort() {

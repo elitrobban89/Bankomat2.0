@@ -8,7 +8,11 @@ public class BankService {
     private final BankRepository repo;
 
     public BankService() {
-        this.repo = new BankRepository();
+        this(new BankRepository());
+    }
+
+    public BankService(BankRepository repo) {
+        this.repo = repo;
     }
 
     public void newClient(String name, String gatuadress, String postnr, String stad) {
@@ -69,15 +73,28 @@ public class BankService {
         repo.transfer(from, to, belopp, ocr);
     }
 
-    public List<String> getKontoInfo(String kontonr) {
-        List<String> result = repo.getKontoInfo(kontonr);
-        if (result.isEmpty())
+    public KontoInfo getKontoDetails(String kontonr) {
+        validateAccountNumber(kontonr);
+        KontoInfo info = repo.getKontoDetails(kontonr);
+        if (info == null)
             throw new BankException("Felaktigt kontonummer");
-        return result;
+        return info;
     }
 
-    public List<String> getTransactions(String kontonr) {
+    public List<KontoInfo> getAccountsByPerson(String namn) {
+        return repo.getAccountsByPerson(namn);
+    }
+
+    public List<KontoInfo> getAllAccounts() {
+        return repo.getAllAccounts();
+    }
+
+    public List<TransactionInfo> getTransactions(String kontonr) {
         return repo.getTransactions(kontonr);
+    }
+
+    public double getTotalSaldo(String namn) {
+        return repo.getTotalSaldo(namn);
     }
 
     public List<String> getAllPersonNames() {
@@ -122,7 +139,7 @@ public class BankService {
 
     private double parseBelopp(String str) {
         try {
-            return Double.parseDouble(str);
+            return Double.parseDouble(str.replace(",", "."));
         } catch (NumberFormatException e) {
             throw new BankException("Felaktigt belopp");
         }
@@ -131,7 +148,7 @@ public class BankService {
     private double parseSaldo(String str) {
         if (str == null || str.trim().isEmpty()) return 0.0;
         try {
-            return Double.parseDouble(str);
+            return Double.parseDouble(str.replace(",", "."));
         } catch (NumberFormatException e) {
             return 0.0;
         }

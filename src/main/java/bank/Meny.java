@@ -9,10 +9,11 @@ public class Meny extends JFrame implements ActionListener {
     private final BankService bankService = new BankService();
     private JButton btnRegister;
     private JButton btnAccount;
+    private JButton btnOversikt;
 
     public Meny() {
         setTitle("Bankomat 2.0");
-        setSize(400, 340);
+        setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -29,13 +30,16 @@ public class Meny extends JFrame implements ActionListener {
         center.setBackground(UITheme.BG);
         center.setBorder(BorderFactory.createEmptyBorder(24, 32, 24, 32));
 
-        JPanel card = UITheme.cardPanel(new GridLayout(2, 1, 0, 12));
+        JPanel card = UITheme.cardPanel(new GridLayout(3, 1, 0, 12));
         btnRegister = UITheme.primaryButton("Registervård");
         btnAccount  = UITheme.primaryButton("Kontohantering");
+        btnOversikt = UITheme.secondaryButton("Kontoöversikt");
         btnRegister.addActionListener(this);
         btnAccount.addActionListener(this);
+        btnOversikt.addActionListener(this);
         card.add(btnRegister);
         card.add(btnAccount);
+        card.add(btnOversikt);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -54,6 +58,8 @@ public class Meny extends JFrame implements ActionListener {
         } else if (e.getSource() == btnAccount) {
             this.setVisible(false);
             new Kontohantering(bankService, this).setVisible(true);
+        } else if (e.getSource() == btnOversikt) {
+            new KontoversiktDialog(this, bankService).setVisible(true);
         }
     }
 
