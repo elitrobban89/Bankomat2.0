@@ -8,13 +8,21 @@ import java.util.List;
 
 public class BankRepository {
 
-    private static final String DB_URL = "jdbc:sqlite:werasbetal.db";
+    private static final String DEFAULT_DB_URL = "jdbc:sqlite:werasbetal.db";
     private static final DateTimeFormatter SQLITE_TS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    static {
+    private final String dbUrl;
+
+    public BankRepository() {
+        this(DEFAULT_DB_URL);
+    }
+
+    /** Databas-URL:en är konfigurerbar så att tester kan köra mot en temporär databas. */
+    public BankRepository(String dbUrl) {
+        this.dbUrl = dbUrl;
         try {
             Class.forName("org.sqlite.JDBC");
-            try (Connection c = DriverManager.getConnection(DB_URL); Statement st = c.createStatement()) {
+            try (Connection c = DriverManager.getConnection(dbUrl); Statement st = c.createStatement()) {
                 st.execute("CREATE TABLE IF NOT EXISTS person (name VARCHAR(50), gatuadress VARCHAR(50), postnr CHAR(5), stad VARCHAR(50))");
                 st.execute("CREATE TABLE IF NOT EXISTS konto (kontonr CHAR(13), kontotyp VARCHAR(10), namn VARCHAR(50), saldo DOUBLE)");
                 st.execute("CREATE TABLE IF NOT EXISTS gjordatrans (kontonr CHAR(13), typ CHAR(3), belopp DOUBLE, OCRmeddelande VARCHAR(70), created_at TIMESTAMP)");
@@ -22,9 +30,9 @@ public class BankRepository {
                 createUniqueIndexes(st);
             }
         } catch (ClassNotFoundException e) {
-            throw new ExceptionInInitializerError("SQLite JDBC driver not found: " + e.getMessage());
+            throw new BankException("SQLite JDBC driver not found: " + e.getMessage());
         } catch (SQLException e) {
-            throw new ExceptionInInitializerError("Kunde inte initiera databasen: " + e.getMessage());
+            throw new BankException("Kunde inte initiera databasen: " + e.getMessage());
         }
     }
 
@@ -58,7 +66,7 @@ public class BankRepository {
     }
 
     private Connection connect() throws SQLException {
-        return DriverManager.getConnection(DB_URL);
+        return DriverManager.getConnection(dbUrl);
     }
 
     public boolean personExists(String name) {

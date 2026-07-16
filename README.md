@@ -91,18 +91,23 @@ Webbversionen är designad som en riktig bankomat, med interaktiv "hårdvara":
 Projektet är uppdelat i tre lager:
 
 ```
-UI-lager          Meny, Val, Kontohantering, NyPersonForm, NyttKontoForm,
-                  TransaktionDialog, PersonListDialog
+UI-lager          Meny, Val, Kontohantering, KontoversiktDialog, NyPersonForm,
+                  NyttKontoForm, TransaktionDialog, PersonListDialog
     ↓
 Servicelager      BankService — affärslogik och validering
     ↓
 Datalager         BankRepository — SQL-frågor med PreparedStatement
+                  KontoInfo, TransactionInfo — typade modeller (records)
 ```
 
 - **UI-lagret** hanterar endast grafik och visar felmeddelanden via `JOptionPane`
 - **BankService** validerar indata och kastar `BankException` med användarvänliga felmeddelanden
 - **BankRepository** sköter all databaskommunikation med parametriserade frågor (skyddar mot SQL injection)
-- Databasen skapas automatiskt om den inte finns
+- Service- och datalagret har samma API i båda versionerna — `BankService` är identisk
+  sånär som på Spring-annoteringarna, och `BankService` tar en injicerbar repository
+  vilket gör logiken testbar med mockad databas
+- Databasen skapas automatiskt om den inte finns; äldre databaser migreras automatiskt
+  vid start (tidsstämpelkolumnen `created_at` och unika index läggs till)
 
 ## Kom igång
 
@@ -125,6 +130,14 @@ javac -cp "lib/sqlite-jdbc-3.7.15-M1.jar" -d out/production/min_labb3 src/main/j
 java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.7.15-M1.jar" bank.Meny
 ```
 
+### Bygga och testa med Maven
+
+Skrivbordsversionen är även ett Maven-projekt (kräver Maven installerat):
+
+```bash
+mvn test        # kör skrivbordsversionens testsvit
+```
+
 ## Projektstruktur
 
 ```
@@ -141,7 +154,11 @@ min_labb3/
 │       └── test/java/bank/                # BankServiceTest, BankControllerTest
 ├── Dockerfile                             # Docker-bygge för Render
 ├── render.yaml                            # Render-konfiguration
+├── pom.xml                                # Maven-bygge för skrivbordsversionen (tester)
 ├── src/                                   # Skrivbordsversion (Swing)
+│   ├── test/
+│   │   └── java/
+│   │       └── bank/                      # BankServiceTest, BankRepositoryTest
 │   └── main/
 │       └── java/
 │           └── bank/
@@ -185,11 +202,25 @@ Databasen innehåller Looney Tunes-karaktärer som testdata:
 - Överföring till samma konto är inte tillåten
 - Kontoinnehavaren måste finnas registrerad innan ett konto skapas
 - En kontoinnehavare kan inte tas bort om aktiva konton finns
-- Personnamn och kontonummer är unika (unika index i webbversionens databas)
+- Personnamn och kontonummer är unika (unika index i båda versionernas databaser)
 
 ## Tester
 
-Webbversionen har en testsvit med 23 tester (JUnit 5 + Mockito + MockMvc):
+Båda versionerna har egna testsviter (JUnit 5 + Mockito).
+
+**Skrivbordsversionen** (38 tester):
+
+- `BankServiceTest` — validering och affärslogik med mockad repository
+  (belopp, kontonummer, decimalkomma, täckning m.m.)
+- `BankRepositoryTest` — integrationstester mot en temporär SQLite-databas:
+  riktiga SQL-frågor, rollback vid misslyckade uttag/överföringar,
+  automatisk migrering av äldre databaser och de unika indexen
+
+```bash
+mvn test
+```
+
+**Webbversionen** (23 tester, + MockMvc):
 
 - `BankServiceTest` — validering och affärslogik (belopp, kontonummer, täckning m.m.)
 - `BankControllerTest` — sidrendering, inklusive regressionstest för Thymeleaf-mallarna
