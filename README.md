@@ -208,7 +208,8 @@ Databasen innehåller Looney Tunes-karaktärer som testdata:
 
 ## Tester
 
-Båda versionerna har egna testsviter (JUnit 5 + Mockito).
+Båda versionerna har egna testsviter — totalt 61 tester (JUnit 5 + Mockito).
+Alla körs automatiskt i CI vid varje push.
 
 **Skrivbordsversionen** (38 tester):
 
