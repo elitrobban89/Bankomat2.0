@@ -1,5 +1,7 @@
 # Bankomat 2.0
 
+![CI](https://github.com/elitrobban89/Bankomat2.0/actions/workflows/ci.yml/badge.svg)
+
 Ett internt bankhanteringssystem med två versioner:
 
 - **Webbversion (live):** [elitrobban.se/bankomat-2-0/](https://elitrobban.se/bankomat-2-0/) — Spring Boot + Thymeleaf + PostgreSQL, driftsatt på Render
