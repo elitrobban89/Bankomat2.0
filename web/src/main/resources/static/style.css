@@ -1533,9 +1533,18 @@ body::before {
   /* Knappsatsen visas på mobil — touch-optimerad. Numpaden överst, funktions-
      tangenterna (AVBRYT/RENSA/OK) som en rad under, så inget hamnar utanför skärmen.
      Behåller den borstade stål-looken men skalar upp för fingrar (~52px höjd). */
-  /* Skjut ner nedre sektionen (uttagsfack + knappsats) så knappsatsen
-     hamnar längre ner på skärmen i stället för direkt under formuläret. */
-  .atm-bottom-wrapper { margin-top: 128px; }
+  /* Fäst nedre sektionen (uttagsfack + knappsats) längst ner i vyn så knappsatsen
+     sitter på EXAKT samma ställe i varje meny — i stället för att hoppa med hur mycket
+     text varje vy har. Skärmen får padding-bottom så sista status-/resultattexten
+     alltid kan scrollas fram ovanför panelen och aldrig döljs bakom den. */
+  .atm-bottom-wrapper {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 30;
+    background: #040804;
+    box-shadow: 0 -10px 26px rgba(0,0,0,.65);
+  }
+  .atm-screen { padding-bottom: 300px; }
 
   .atm-keypad-section {
     display: flex;
