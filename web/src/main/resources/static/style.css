@@ -1529,7 +1529,34 @@ body::before {
   }
 
   .screen-main { padding: 14px 12px; overflow: visible; }
-  .atm-keypad-section { display: none; }
+
+  /* Knappsatsen visas på mobil — touch-optimerad. Numpaden överst, funktions-
+     tangenterna (AVBRYT/RENSA/OK) som en rad under, så inget hamnar utanför skärmen.
+     Behåller den borstade stål-looken men skalar upp för fingrar (~52px höjd). */
+  .atm-keypad-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 12px calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .keypad-grid {
+    width: 100%;
+    max-width: 300px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 12px;
+  }
+  .num-key { width: auto; height: 52px; font-size: 21px; border-radius: 6px; }
+  .keypad-grid .num-key:nth-child(5)::after { bottom: 7px; width: 5px; height: 5px; }
+  .special-keys {
+    flex-direction: row;
+    width: 100%;
+    max-width: 300px;
+    gap: 8px;
+  }
+  .sp-key { flex: 1 1 0; width: auto; height: 48px; font-size: 11px; border-radius: 7px; }
+
   .atm-cash-slot { border-radius: 0; }
 
   .btn-row-2 { flex-direction: column; }

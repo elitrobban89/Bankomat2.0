@@ -381,6 +381,19 @@
           });
         });
 
+        // På mobil: låt ATM-knappsatsen vara inmatningsmetod för sifferfält (belopp,
+        // kontonummer, saldo, postnr) så det inbyggda tangentbordet inte täcker knappsatsen.
+        // Textfält (namn, adress, OCR) lämnas orörda och behåller vanligt tangentbord.
+        if (window.matchMedia && window.matchMedia('(max-width: 580px)').matches) {
+          var NUM_FIELDS = ['belopp', 'kontonr', 'tillKonto', 'saldo', 'postnr'];
+          document.querySelectorAll('.screen-main input[type="text"]').forEach(function (inp) {
+            if (NUM_FIELDS.indexOf(inp.getAttribute('name')) !== -1) {
+              inp.setAttribute('inputmode', 'none');
+              inp.setAttribute('autocomplete', 'off');
+            }
+          });
+        }
+
         // Knappsatsen skriver i det senast fokuserade fältet på skärmen
         var activeInput = null;
         document.addEventListener('focusin', function (e) {
