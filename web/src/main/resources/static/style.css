@@ -1533,9 +1533,9 @@ body::before {
   /* Knappsatsen visas på mobil — touch-optimerad. Numpaden överst, funktions-
      tangenterna (AVBRYT/RENSA/OK) som en rad under, så inget hamnar utanför skärmen.
      Behåller den borstade stål-looken men skalar upp för fingrar (~52px höjd). */
-  /* Skjut ner nedre sektionen (uttagsfack + knappsats) en bit så knappsatsen
+  /* Skjut ner nedre sektionen (uttagsfack + knappsats) så knappsatsen
      hamnar längre ner på skärmen i stället för direkt under formuläret. */
-  .atm-bottom-wrapper { margin-top: 64px; }
+  .atm-bottom-wrapper { margin-top: 128px; }
 
   .atm-keypad-section {
     display: flex;
