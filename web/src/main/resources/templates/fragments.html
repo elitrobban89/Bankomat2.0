@@ -347,11 +347,34 @@
         }, 5900);
       }
 
+      // Landa i bankomaten, inte i säljtexten.
+      //
+      // På elitrobban.se/bankomat-2-0/ ligger appen i ett <iframe> under sidhuvud, rubrik
+      // och en lång funktionslista — besökaren landade i texten med maskinen under vikkanten.
+      //
+      // Rullningen måste ske i FÖRÄLDERSIDAN, och den är korsdomän (elitrobban.se mot
+      // onrender.com) — vi kommer inte åt dess scrollposition. scrollIntoView() på ett element
+      // HÄR INNE gör ändå jobbet: webbläsaren rullar alla omslutande scrollytor, ramen
+      // inräknad, och det fungerar över domängränsen (uppmätt i Chrome mot två skilda origins).
+      // window.parent.postMessage hade krävt en lyssnare i WordPress-sidan, och den sidan är en
+      // manuell kopia utan ett enda eget skript.
+      function rullaFramAppen() {
+        if (window.top === window.self) return; // står vi själva är vi redan överst
+        try {
+          document.body.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        } catch (e) {
+          try { document.body.scrollIntoView(true); } catch (e2) {}
+        }
+      }
+
       document.addEventListener('DOMContentLoaded', function () {
         fitAtm();
         crtSetup();
         matrixRain();
         intro();
+        // Efter fitAtm(): maskinen skalas med zoom och byter höjd, och rullningen ska sikta
+        // på det slutliga läget, inte det ostyrda.
+        setTimeout(rullaFramAppen, 350);
         dispenseCash();
         printReceipt();
         animateCounts();
