@@ -91,14 +91,26 @@
       tick();
       setInterval(tick, 15000);
 
-      // Skala hela bankomaten så att den får plats i fönstrets höjd
+      // Skala hela bankomaten efter fönstret — BÅDA hållen.
+      //
+      // Förut krympte den bara: "if (scale < 1)". I ramen på elitrobban.se (1280 × 950) blev
+      // maskinen därför liggande på sina naturliga 660 × 904 px, alltså 52 % av bredden och
+      // 95 % av höjden — den SÅG liten ut fast den fyllde höjden. Nu växer den också, upp till
+      // ett tak, och begränsas av det som tar slut först: höjden eller bredden.
+      //
+      // Höjden är den bindande faktorn i en 950 px hög ram (maskinen är hög och smal, 660:904).
+      // Görs ramen högre i WordPress-blocket växer maskinen med den, utan ytterligare ändringar.
+      var ATM_MAX_ZOOM = 1.45;
       function fitAtm() {
         var m = document.querySelector('.atm-machine');
         if (!m) return;
         m.style.zoom = '';
         if (window.innerWidth <= 580) return;
-        var scale = (window.innerHeight - 30) / m.offsetHeight;
-        if (scale < 1) m.style.zoom = scale;
+        // Läs måtten med zoom avstängd, annars skalas redan skalade mått en gång till.
+        var tillHojd  = (window.innerHeight - 30) / m.offsetHeight;
+        var tillBredd = (window.innerWidth - 24) / m.offsetWidth;
+        var skala = Math.min(tillHojd, tillBredd, ATM_MAX_ZOOM);
+        if (skala < 0.99 || skala > 1.01) m.style.zoom = skala;
       }
       window.addEventListener('resize', fitAtm);
       window.addEventListener('load', fitAtm);
