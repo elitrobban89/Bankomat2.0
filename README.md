@@ -53,7 +53,7 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 
 | Komponent | Teknologi |
 |-----------|-----------|
-| Backend | Spring Boot 3 |
+| Backend | Spring Boot 3.5.16 |
 | Templating | Thymeleaf |
 | Databas | PostgreSQL |
 | Hosting | Render (Docker) |
