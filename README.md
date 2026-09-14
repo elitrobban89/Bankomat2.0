@@ -58,6 +58,7 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 | Databas | PostgreSQL |
 | Hosting | Render (Docker) |
 | Font | Share Tech Mono (Google Fonts) |
+| Java-version | Java 25 |
 
 ## Webbdesign
 
