@@ -47,7 +47,7 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 | GUI | Java Swing |
 | Databas | SQLite |
 | JDBC-driver | sqlite-jdbc 3.7.15 |
-| Java-version | Java 17+ |
+| Java-version | Java 25 |
 
 **Webbversion**
 
@@ -115,7 +115,7 @@ Datalager         BankRepository — SQL-frågor med PreparedStatement
 
 ### Krav
 
-- Java 17 eller senare (koden använder records)
+- Java 25 (koden använder records)
 
 ### Kör med JAR (enklaste sättet)
 
