@@ -3,6 +3,7 @@ package bank;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/** @author Robert Andersson Kopler */
 public record TransactionInfo(String typ, double belopp, String ocr, LocalDateTime createdAt) {
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

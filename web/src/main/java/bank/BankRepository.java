@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/** @author Robert Andersson Kopler */
 @Repository
 public class BankRepository {
 

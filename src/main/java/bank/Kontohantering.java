@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 
+/** @author Robert Andersson Kopler */
 public class Kontohantering extends JFrame {
 
     private final BankService bankService;

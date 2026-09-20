@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/** @author Robert Andersson Kopler */
 public class BankRepository {
 
     private static final String DEFAULT_DB_URL = "jdbc:sqlite:werasbetal.db";

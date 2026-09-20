@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/** @author Robert Andersson Kopler */
 @Service
 public class BankService {
 

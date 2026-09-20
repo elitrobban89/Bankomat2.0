@@ -5,6 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/** @author Robert Andersson Kopler */
 public class KontoversiktDialog extends JDialog {
 
     public KontoversiktDialog(JFrame parent, BankService bankService) {

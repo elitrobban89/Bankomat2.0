@@ -2,6 +2,7 @@ package bank;
 
 import java.util.List;
 
+/** @author Robert Andersson Kopler */
 public class BankService {
 
     private static final double MAX_BELOPP = 20000;

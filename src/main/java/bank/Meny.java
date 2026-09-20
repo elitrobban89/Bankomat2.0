@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/** @author Robert Andersson Kopler */
 public class Meny extends JFrame implements ActionListener {
 
     private final BankService bankService = new BankService();

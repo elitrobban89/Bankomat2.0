@@ -3,6 +3,7 @@ package bank;
 import javax.swing.*;
 import java.awt.*;
 
+/** @author Robert Andersson Kopler */
 public class PersonListDialog extends JDialog {
 
     private final BankService bankService;

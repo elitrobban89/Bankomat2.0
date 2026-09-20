@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/** @author Robert Andersson Kopler */
 public class Val extends JFrame implements ActionListener {
 
     private final BankService bankService;

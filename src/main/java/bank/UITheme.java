@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/** @author Robert Andersson Kopler */
 class UITheme {
 
     static final Color PRIMARY      = new Color(25, 118, 210);

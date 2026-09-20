@@ -3,6 +3,7 @@ package bank;
 import javax.swing.*;
 import java.awt.*;
 
+/** @author Robert Andersson Kopler */
 public class NyPersonForm extends JFrame {
 
     private final BankService bankService;

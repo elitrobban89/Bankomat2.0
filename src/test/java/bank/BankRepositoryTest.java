@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Integrationstester mot en riktig (temporär) SQLite-databas. */
+/** @author Robert Andersson Kopler */
 class BankRepositoryTest {
 
     @TempDir
