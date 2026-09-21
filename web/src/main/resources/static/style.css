@@ -210,7 +210,24 @@ body {
     0 0 30px rgba(0,255,80,.08);
   overflow: hidden;
   position: relative;
-  height: 480px;
+  /* Skarmhojden foljer fonstret i stallet for att sta pa 480 px.
+
+     Maskinen ar hog och smal (660 x 904) och skalas av fitAtm sa att HOJDEN far plats.
+     I en ram som ar bred och lag - 900 x 642 pa en laptop - band darfor hojden, och
+     maskinen blev 47 % av rambredden med svarta falt pa bada sidor. 480 px av de 904
+     var skarmen, och den stod till stor del tom.
+
+     Kortare skarm -> lagre maskin -> fitAtm skalar UPP mer -> bredare maskin och storre
+     text, utan att en enda proportion i designen andras. vh ar ramens hojd (appen kors i
+     ett iframe), sa talet foljer den ram den faktiskt far. Innehallet i .screen-main
+     rullar redan internt, sa en lagre skarm doljer ingenting.
+
+     Taket 480 px behalls: pa en hog skarm ska den se ut precis som forr.
+
+     Golvet 320 px ar MATT, inte valt: huvudmenyns innehall ar 283 px CSS, och vid 300 px
+     borjar .screen-main rulla internt. Innehallet krymper inte med zoomen - den skalar
+     skarm och innehall lika mycket - sa om menyn ryms avgors bara av CSS-talen. */
+  height: clamp(320px, 45vh, 480px);
   display: flex;
   flex-direction: column;
 }
