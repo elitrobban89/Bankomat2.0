@@ -1693,10 +1693,10 @@ body::before {
   /* Utzoomat skarminnehall: mindre text och tatare rader far in mer i den yta som
      faktiskt syns. Talen ar satta i em dar det gar, sa en enda andring av .screen-main
      skalar hela innehallet i stallet for att behova jagas i tio regler. */
-  .screen-main { padding: 11px 10px; overflow: visible; font-size: .88em; }
-  .menu-btn { padding: 10px 14px; font-size: 12px; margin-bottom: 6px; }
-  .screen-welcome h2 { font-size: 12.5px; }
-  .screen-welcome p  { font-size: 9px; }
+  .screen-main { padding: 9px 8px; overflow: visible; font-size: .8em; }
+  .menu-btn { padding: 9px 11px; font-size: 11px; margin-bottom: 5px; }
+  .screen-welcome h2 { font-size: 11.5px; }
+  .screen-welcome p  { font-size: 8.5px; }
   .card-accept { margin-top: 10px; padding-top: 8px; }
   .card-accept b { font-size: 10px; }
   .card-accept i { font-size: 7.5px; }
@@ -1959,32 +1959,34 @@ body::before {
      riktning racker darfor inte: den stod kvar BREDVID skarmen och at 263 av 390 px, sa
      displayen klamdes ihop till 127 px och blev oläslig. Raden maste brytas - .atm-mid far
      wrap, och spalten laggs sist pa en egen rad under skarmen. */
-  .atm-mid { flex-wrap: wrap; }
-  /* Wrap ensamt racker inte: skarmen har flex-basis 0, sa raden "ryms" aven nar spalten
-     tar hela bredden - och da klams displayen till 0 px i stallet for att flyttas ned.
-     BADA maste kravas hela raden for att brytningen ska ske. */
-  .atm-screen { flex: 1 1 100%; width: 100%; }
+  /* Spalten star BREDVID skarmen har precis som pa dator. Det kravde att den blev smal:
+     104 px bredvid en 390 px telefon lamnade 127 px at displayen, vilket var olasligt.
+     En telefon behover inte samma spalt som en 900 px ram - slitsarna krymper i stallet. */
+  .atm-screen { flex: 1 1 auto; width: auto; min-width: 0; }
   .atm-hoger {
-    order: 3;
-    flex: 0 0 100%;
-    width: 100%;
+    flex: 0 0 auto;
     flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 18px;
-    margin-top: 10px;
+    align-items: stretch;
   }
   /* Sidknapparna ar dekor och tar plats som displayen behover battre pa en telefon. */
   .atm-side { display: none; }
   .atm-service {
-    width: auto;
-    flex-direction: row;
+    width: 62px;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 22px;
-    margin: 0;
-    padding: 8px 14px;
+    justify-content: flex-start;
+    gap: 0;
+    margin: 0 0 0 3px;
+    padding: 8px 4px;
   }
+  /* Slitsarna maste folja spaltens bredd - annars spranger de den och ater av skarmen. */
+  .atm-service .receipt-housing { width: 46px; height: 11px; }
+  .atm-service .card-slot-housing { width: 50px; height: 17px; }
+  .atm-service .card-slot-slit { width: 34px; height: 7px; }
+  .atm-service .receipt-label,
+  .atm-service .card-slot-label { font-size: 6px; letter-spacing: .5px; }
+  .atm-service .card-slot-hint { display: none; }
+  .atm-service .card-slot-outer { margin-top: 30%; }
   .atm-service .receipt-slot,
   .atm-service .card-slot-outer { margin-top: 0; }
   .atm-idplat { display: none; }
