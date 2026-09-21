@@ -1,6 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
 :root {
+  /* Chassit: blatt plathus som pa en riktig Bankomat. Skarmen och kortinkastets ljus
+     ar KVAR i gront - det ar sa maskinen ser ut i verkligheten, och det ar kontrasten
+     mellan kall plat och varm fosfor som gor att displayen lyser. */
+  --hus-1:  #123448;   /* ljusast, overkant mot lampan */
+  --hus-2:  #0c2536;
+  --hus-3:  #071824;   /* morkast, nederkant */
+  --hus-kant: #1d5170;
+  --hus-ljus: 200,235,255;   /* rgb for highlights, anvands med rgba() */
   --grn:    #00ff7f;
   --grn-d:  #00cc5a;
   --grn-dk: #003a18;
@@ -41,38 +49,63 @@ body {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 660px;
-  background: linear-gradient(170deg, #0e1a10 0%, #080e09 55%, #040804 100%);
+  max-width: 760px;   /* 660 + servicespalten till hoger om displayen */
+  /* Fyra lager, uppifran och ned:
+       1. skruvhuvuden i horn - sma radialgradienter, inga extra element,
+       2. borstad plat: tata lodrata streck, knappt synliga var for sig,
+       3. ljuset uppifran - i butiken sitter lampan ovanfor maskinen och
+          overkanten ar alltid ljusast, det ar det som gor plat till PLAT,
+       4. grundfargen.
+     Allt ar statiskt: inget av det animeras, sa texturen kostar ingenting att rita. */
+  background:
+    radial-gradient(circle at 14px 16px, rgba(255,255,255,.14) 0 1px, rgba(0,0,0,.5) 1.4px 2.6px, transparent 3px),
+    radial-gradient(circle at calc(100% - 14px) 16px, rgba(255,255,255,.14) 0 1px, rgba(0,0,0,.5) 1.4px 2.6px, transparent 3px),
+    radial-gradient(circle at 14px calc(100% - 14px), rgba(255,255,255,.1) 0 1px, rgba(0,0,0,.45) 1.4px 2.6px, transparent 3px),
+    radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), rgba(255,255,255,.1) 0 1px, rgba(0,0,0,.45) 1.4px 2.6px, transparent 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.16) 0 1px, transparent 1px 7px),
+    linear-gradient(180deg, rgba(var(--hus-ljus),.1) 0%, rgba(var(--hus-ljus),.03) 7%, transparent 22%),
+    linear-gradient(170deg, var(--hus-1) 0%, var(--hus-2) 55%, var(--hus-3) 100%);
   border-radius: 22px 22px 14px 14px;
   box-shadow:
-    0 0 0 1px #1a3020,
-    0 0 0 3px #050a06,
-    0 0 0 4px #0d1a0d,
+    0 0 0 1px var(--hus-kant),
+    0 0 0 3px #04121b,
+    0 0 0 4px #0a2637,
     0 30px 80px rgba(0,0,0,.95),
     0 0 60px rgba(0,255,100,.04);
 }
 
 /* ── Top: brand + card slot ── */
 .atm-top {
-  background: linear-gradient(180deg, #0a1e0c 0%, #060e07 100%);
+  /* Egen plat med tydligare ljus i overkanten an kroppen - panelen lutar utat mot
+     betraktaren pa en riktig maskin, och fangar darfor mer av lampan. Nederkanten far
+     en skarv: ljus linje ovanfor, mork under, vilket ar hur tva platar moter varandra. */
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, rgba(var(--hus-ljus),.16) 0%, rgba(var(--hus-ljus),.04) 12%, transparent 34%),
+    linear-gradient(180deg, #164058 0%, #0c2839 100%);
   border-radius: 22px 22px 0 0;
-  padding: 18px 32px 16px;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,.75), 0 1px 0 rgba(var(--hus-ljus),.07);
+  padding: 30px 32px 20px;   /* mer luft OVER rubriken an under */
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  border-bottom: 2px solid #0d2010;
+  border-bottom: 2px solid #061722;
 }
 
+/* Skylten ar BAKBELYST och vit, inte fosforgron: pa maskinen i butiken ar namnet en
+   lysande panel i fascian, och det grona hor till displayen. Behaller man gront pa bada
+   ser huset ut att vara gjort av samma material som skarmen. */
 .atm-brand {
-  color: var(--grn);
+  color: #eaf6ff;
   font-size: 22px;
   font-weight: bold;
   letter-spacing: 7px;
   text-shadow:
-    0 0 10px rgba(0,255,127,.8),
-    0 0 30px rgba(0,255,127,.3),
-    0 0 60px rgba(0,255,127,.1);
+    0 0 10px rgba(180,225,255,.85),
+    0 0 26px rgba(120,190,255,.45),
+    0 0 60px rgba(90,160,230,.2);
   text-transform: uppercase;
   animation: flicker 8s infinite;
 }
@@ -85,7 +118,7 @@ body {
 }
 
 .atm-subtitle {
-  color: var(--txt-d);
+  color: #8fb0c4;   /* tryckt text pa platen, matt mot den lysande skylten */
   font-size: 9px;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -144,7 +177,7 @@ body {
 }
 
 .card-slot-label {
-  color: var(--txt-d);
+  color: #7f9cb0;   /* tryckt pa plat, inte fosfor */
   font-size: 8px;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -213,9 +246,17 @@ body {
   background: var(--sc);
   border: 3px solid #040a05;
   border-radius: 6px;
+  /* Ramen ska sitta NEDSANKT i platen. Ljuset kommer uppifran, sa overkanten av
+     oppningen kastar en skugga in over glaset och underkanten far en tunn ljusrand -
+     den kombinationen ar vad ogat laser som djup. Utan den ligger skarmen som ett
+     klistermarke pa panelen. */
   box-shadow:
+    inset 0 6px 14px rgba(0,0,0,.85),
+    inset 0 -2px 0 rgba(var(--hus-ljus),.09),
     inset 0 0 50px rgba(0,0,0,.9),
     inset 0 0 80px rgba(0,255,80,.03),
+    0 2px 0 rgba(var(--hus-ljus),.06),
+    0 -1px 0 rgba(0,0,0,.8),
     0 0 30px rgba(0,255,80,.08);
   overflow: hidden;
   position: relative;
@@ -400,8 +441,12 @@ body {
 
 /* ── Keypad ── */
 .atm-keypad-section {
-  background: linear-gradient(180deg, #060e07 0%, #040804 100%);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, rgba(var(--hus-ljus),.07) 0%, transparent 18%),
+    linear-gradient(180deg, #0a2131 0%, #071722 100%);
   border-top: 2px solid #040a05;
+  box-shadow: inset 0 1px 0 rgba(var(--hus-ljus),.08);
   padding: 12px 16px;
   display: flex;
   justify-content: center;
@@ -549,7 +594,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,.95);
+  /* Djupet ligger i tre lager: skugga in ovanifran (platen kastar in i oppningen),
+     en ljus lapp langst ned dar underkanten fangar rumsljuset, och en tunn mork linje
+     ovanfor sa kanten far tjocklek. Samma recept som skarmramen. */
+  box-shadow:
+    inset 0 5px 9px rgba(0,0,0,.95),
+    inset 0 -2px 0 rgba(var(--hus-ljus),.13),
+    0 1px 0 rgba(var(--hus-ljus),.07),
+    0 -1px 0 rgba(0,0,0,.8);
   position: relative;
   perspective: 240px;
 }
@@ -642,13 +694,16 @@ body {
 
 .cash-slit {
   width: 200px;
-  height: 3px;
-  background: #000;
+  height: 4px;
+  /* Inte platt svart: ljusare i mitten dar oppningen ar djupast och ljuset inte nar in,
+     morkare mot kanterna. Det ar skillnaden mellan ett HAL och en malad rand. */
+  background: linear-gradient(180deg, #000 0%, #060a06 55%, #000 100%);
   border-radius: 1px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,1), 0 1px 0 rgba(var(--hus-ljus),.06);
 }
 
 .cash-label {
-  color: var(--txt-d);
+  color: #7f9cb0;
   font-size: 8px;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -1292,9 +1347,12 @@ body::before {
 /* ══════════════════════════════════════════
    STATUS LAMP (I DRIFT / BEARBETAR)
 ══════════════════════════════════════════ */
+/* Lampan ar absolut och foljde darfor INTE med nar toppanelens padding okade - rubriken
+   flyttade ner, lampan stod kvar. Talet ar satt sa att lampan star i linje med rubrikens
+   ovankant; andras paddingen maste det har folja med. */
 .status-lamp {
   position: absolute;
-  top: 22px;
+  top: 34px;
   left: 26px;
   display: flex;
   align-items: center;
@@ -1340,15 +1398,15 @@ body::before {
 ══════════════════════════════════════════ */
 .atm-top { position: relative; }
 
+/* Kvittooppningen satt ABSOLUT i toppanelens hogra horn. Nar den flyttades till
+   servicespalten folide markupen med men inte layouten - den absoluta positionen holl
+   kvar den uppe i fascian, mitt i luften. Den ar en vanlig flexrad nu och ligger dar den
+   ligger i DOM:en, vilket ar hela poangen med flytten. */
 .receipt-slot {
-  position: absolute;
-  top: 22px;
-  right: 26px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  z-index: 5;
 }
 
 .receipt-housing {
@@ -1360,7 +1418,10 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,.9);
+  box-shadow:
+    inset 0 4px 7px rgba(0,0,0,.92),
+    inset 0 -1px 0 rgba(var(--hus-ljus),.12),
+    0 1px 0 rgba(var(--hus-ljus),.06);
   position: relative;
 }
 
@@ -1377,7 +1438,7 @@ body::before {
 }
 
 .receipt-label {
-  color: var(--txt-d);
+  color: #7f9cb0;
   font-size: 8px;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -1490,7 +1551,13 @@ body::before {
   transition: all .3s;
 }
 
-.atm-cash-slot { position: relative; }
+.atm-cash-slot {
+  position: relative;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, rgba(var(--hus-ljus),.05) 0%, transparent 26%);
+  box-shadow: inset 0 1px 0 rgba(var(--hus-ljus),.06), inset 0 -1px 0 rgba(0,0,0,.6);
+}
 
 .cash-housing.dispensing {
   border-color: var(--grn-dk);
@@ -1663,4 +1730,92 @@ body::before {
 }
 @media (max-width: 580px) {
   .card-accept { justify-content: center; }
+}
+
+/* ── Servicespalt till hoger om displayen ─────────────────────────────────────
+   Kvittooppningen och kortlasaren sitter dar de sitter pa en riktig Bankomat: i en
+   egen, nedsankt platspalt bredvid skarmen, inte uppe i fascian. Spalten ar en del av
+   samma plat som kroppen, sa den har samma borstning och samma ljus uppifran - det ar
+   det som gor att den laser som URFRAST och inte pahangd. */
+.atm-hoger {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+.atm-service {
+  width: 104px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  padding: 10px 8px;
+  margin-left: 4px;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, rgba(var(--hus-ljus),.08) 0%, transparent 22%),
+    linear-gradient(180deg, #0d2c3f 0%, #081d2a 100%);
+  box-shadow:
+    inset 0 3px 8px rgba(0,0,0,.8),
+    inset 0 -1px 0 rgba(var(--hus-ljus),.07),
+    0 1px 0 rgba(var(--hus-ljus),.05);
+}
+.atm-service .receipt-slot,
+.atm-service .card-slot-outer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-top: 0;
+}
+/* Oppningarna ligger LODRATT nu och maste smalna: den gamla bredden var satt for en
+   fascia pa 660 px. Halls de kvar spranger de spalten och skarmen far betala i bredd. */
+.atm-service .receipt-housing { width: 84px; }
+.atm-service .card-slot-housing { width: 88px; height: 24px; }
+.atm-service .card-slot-slit { width: 62px; }
+/* Etsad platskylt: ljus ovankant och mork underkant gor att texten ser INSTANSAD ut
+   i stallet for tryckt pa. */
+.atm-idplat {
+  margin-top: auto;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #0c130c, #070c07);
+  box-shadow: inset 0 1px 0 rgba(var(--hus-ljus),.1), inset 0 -1px 0 rgba(0,0,0,.7),
+    0 1px 0 rgba(var(--hus-ljus),.05);
+  font-size: 6.5px;
+  letter-spacing: 1.4px;
+  color: #6d8698;
+  opacity: .75;
+  text-shadow: 0 -1px 0 rgba(0,0,0,.9), 0 1px 0 rgba(var(--hus-ljus),.08);
+}
+.atm-service .receipt-label,
+.atm-service .card-slot-label {
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-align: center;
+  opacity: .8;
+}
+.atm-service .card-slot-hint {
+  font-size: 7px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--txt-d);
+  opacity: .65;
+}
+@media (max-width: 580px) {
+  /* Pa mobil far spalten inte ata av skarmen - den laggs under i stallet, sida vid sida. */
+  .atm-hoger { flex-direction: column; }
+  .atm-service {
+    width: auto;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 10px;
+    margin: 6px 0 0;
+  }
 }

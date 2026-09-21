@@ -21,19 +21,8 @@
     <span class="led"></span>
     <span class="lamp-label">I drift</span>
   </div>
-  <div class="receipt-slot">
-    <div class="receipt-housing">
-      <div class="receipt-slit"></div>
-      <div class="receipt-wrap"></div>
-    </div>
-    <span class="receipt-label">Kvitto</span>
-  </div>
   <div class="atm-brand">BANKOMAT 2.0</div>
   <div class="atm-subtitle">Weras Betalservice AB</div>
-  <div class="card-slot-outer">
-    <div class="card-slot-housing"><div class="card-slot-slit"></div></div>
-    <span class="card-slot-label">Sätt i kort / Insert card</span>
-  </div>
 </div>
 
 <!-- SIDE KEYS LEFT -->
@@ -44,12 +33,38 @@
   <div class="side-key"></div>
 </div>
 
-<!-- SIDE KEYS RIGHT -->
-<div th:fragment="atm-side-right" class="atm-side right">
-  <div class="side-key"></div>
-  <div class="side-key"></div>
-  <div class="side-key"></div>
-  <div class="side-key"></div>
+<!-- SIDE KEYS RIGHT + SERVICE COLUMN (kvitto, kortlasare)
+     Kvittooppningen och kortlasaren satt forut i toppanelen. Pa en riktig Bankomat sitter
+     de i en egen spalt TILL HOGER om displayen, och det ar ocksa dar handen ar nar man
+     laser skarmen. Fragmentets rot ar darfor spalten och inte sidknapparna: elva sidmallar
+     gor th:replace pa just det har namnet, och da foljer alla med i en enda andring. -->
+<div th:fragment="atm-side-right" class="atm-hoger">
+  <div class="atm-side right">
+    <div class="side-key"></div>
+    <div class="side-key"></div>
+    <div class="side-key"></div>
+    <div class="side-key"></div>
+  </div>
+  <div class="atm-service">
+    <div class="receipt-slot">
+      <div class="receipt-housing">
+        <div class="receipt-slit"></div>
+        <div class="receipt-wrap"></div>
+      </div>
+      <span class="receipt-label">Kvitto</span>
+    </div>
+    <div class="card-slot-outer">
+      <div class="card-slot-housing"><div class="card-slot-slit"></div></div>
+      <span class="card-slot-label">Sätt i kort</span>
+      <span class="card-slot-hint">Chip uppåt</span>
+    </div>
+    <!-- Terminalplat, som den etsade skylten pa en riktig maskin. Numret ar samma som
+         uppstartsskarmens forsta rad sager, sa de tva berattar inte olika saker. -->
+    <div class="atm-idplat">
+      <span>TERM 02</span>
+      <span>WBS-1188</span>
+    </div>
+  </div>
 </div>
 
 <!-- SCREEN BAR -->
