@@ -291,14 +291,14 @@
       // flit - splashen ska fungera aven om fragments-skriptet inte hunnit definiera det.
       timers.push(setTimeout(function () {
         try { if (window.atmSattInKort) window.atmSattInKort(); } catch (e) {}
-      }, 600));
+      }, 900));
       timers.push(setTimeout(function () {
         lager.classList.add('bk-ut');
         setTimeout(function () {
           stoppaRegn();
           if (lager.parentNode) lager.parentNode.removeChild(lager);
         }, 480);
-      }, 420));
+      }, 900));   // vilan pa "klar — satt i kort" innan lagret lyfter
     }
 
     lager.querySelector('.bk-hoppa').addEventListener('click', slutfor);
@@ -315,9 +315,11 @@
 
     skrivBoot(bootEl);
 
-    // ~2,3 s totalt. "Snabb" är kravet: en bankomat som tar fem sekunder på sig att vakna
-    // är en spärr, inte en inledning — särskilt som man kommer tillbaka till menyn ofta.
-    var START = 240, STEG = 230, VAND = 190;
+    // ~5,5 s totalt. Forsta versionen lag pa 2,3 s och var for snabb for att hinna lasas:
+    // raderna bar riktiga uppgifter - databasens namn, Spring Boot-versionen, antalet konton -
+    // och de ska hinna sjunka in. Tiden ligger i STEG och i vilan fore uttoningen, alltsa i
+    // rorelsen, inte i en tom paus dar ingenting hander.
+    var START = 240, STEG = 440, VAND = 230;
     rader.forEach(function (rad, i) {
       var nar = START + i * STEG;
       timers.push(setTimeout(function () { rad.classList.add('syns'); }, nar));
