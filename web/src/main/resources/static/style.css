@@ -1560,7 +1560,7 @@ body::before {
   box-shadow: 0 0 14px rgba(0,255,80,.3);
   z-index: 1;
   opacity: 0;
-  animation: card-insert 2.3s ease-out .2s forwards;
+  animation: card-insert 1.35s ease-out .15s forwards;   /* var 2,3 s - kandes trogt */
   pointer-events: none;
 }
 
@@ -1720,6 +1720,14 @@ body::before {
   .num-key { width: auto; height: 32px; font-size: 14px; border-radius: 4px; }
   .keypad-grid .num-key:nth-child(5)::after { bottom: 4px; width: 4px; height: 4px; }
   .special-keys {
+    /* Datorvyn hanger tangenterna ABSOLUT bredvid numpaden. Den positioneringen foljer
+       med hit om den inte nollas, och da hamnar AVBRYT/RENSA/OK utanfor skarmkanten -
+       pa mobil ligger de i stallet som en rad UNDER numpaden. */
+    position: static;
+    transform: none;
+    left: auto;
+    right: auto;
+    top: auto;
     flex-direction: row;
     width: 100%;
     max-width: 186px;
@@ -1877,12 +1885,116 @@ body::before {
 @media (max-width: 580px) {
   /* Pa mobil far spalten inte ata av skarmen - den laggs under i stallet, sida vid sida. */
   .atm-top { padding-right: 32px; }
-  .atm-hoger { flex-direction: column; }
+  /* Spalten ar ett FLEXBARN till .atm-mid, som ar en RAD. Att bara vanda spaltens egen
+     riktning racker darfor inte: den stod kvar BREDVID skarmen och at 263 av 390 px, sa
+     displayen klamdes ihop till 127 px och blev oläslig. Raden maste brytas - .atm-mid far
+     wrap, och spalten laggs sist pa en egen rad under skarmen. */
+  .atm-mid { flex-wrap: wrap; }
+  /* Wrap ensamt racker inte: skarmen har flex-basis 0, sa raden "ryms" aven nar spalten
+     tar hela bredden - och da klams displayen till 0 px i stallet for att flyttas ned.
+     BADA maste kravas hela raden for att brytningen ska ske. */
+  .atm-screen { flex: 1 1 100%; width: 100%; }
+  .atm-hoger {
+    order: 3;
+    flex: 0 0 100%;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 10px;
+  }
+  /* Sidknapparna ar dekor och tar plats som displayen behover battre pa en telefon. */
+  .atm-side { display: none; }
   .atm-service {
     width: auto;
     flex-direction: row;
-    justify-content: space-around;
-    gap: 10px;
-    margin: 6px 0 0;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin: 0;
+    padding: 8px 14px;
   }
+  .atm-service .receipt-slot,
+  .atm-service .card-slot-outer { margin-top: 0; }
+  .atm-idplat { display: none; }
+}
+
+/* ══════════════════════════════════════════
+   NEONRAM RUNT MASKINEN
+   ══════════════════════════════════════════
+   En ljusrand som vandrar runt kanten och skiftar farg. Tre val som alla har ett skal:
+
+   1. VINKELN AR EN REGISTRERAD @property. En conic-gradients vinkel gar annars inte att
+      animera - webblasaren ser den som en oigenomtranglig strang och hoppar mellan varden
+      i stallet for att glida. Registrerad som <angle> interpoleras den mjukt.
+
+   2. MASK-COMPOSITE GOR ATT BARA KANTEN MALAS. Ett vanligt absolut ::after hade tackt
+      hela maskinen och tvattat ur texten under sig (samma falla som glasgloden pa
+      elbilskorten). Masken skar bort mitten, sa skarmen och knapparna ar helt ororda.
+
+   3. BARA VINKELN ANIMERAS - ingen box-shadow pa ett stort element, ingen filter-animation.
+      Det ar det som gor att en ram runt hela maskinen inte kostar nagot att rita.
+
+   Gloden utanfor kanten ligger i ett eget lager som andas i egen takt, sa ljuset pulserar
+   medan fargen vandrar - tva rorelser som inte ar i fas ser levande ut, en ensam ser
+   mekanisk ut. */
+@property --bk-neonvinkel {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.atm-machine::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 25px 25px 17px 17px;
+  padding: 2px;
+  background: conic-gradient(from var(--bk-neonvinkel),
+    rgba(0,255,127,.95) 0deg,
+    rgba(41,182,255,.9) 90deg,
+    rgba(168,85,247,.85) 180deg,
+    rgba(0,229,255,.9) 270deg,
+    rgba(0,255,127,.95) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: bk-neonvarv 11s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Skenet UTANFOR kanten - samma fargvandring, men suddad och i egen takt. */
+.atm-machine::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 28px 28px 20px 20px;
+  background: conic-gradient(from var(--bk-neonvinkel),
+    rgba(0,255,127,.55), rgba(41,182,255,.5), rgba(168,85,247,.45),
+    rgba(0,229,255,.5), rgba(0,255,127,.55));
+  filter: blur(13px);
+  opacity: .5;
+  animation: bk-neonvarv 11s linear infinite, bk-neonandning 5.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes bk-neonvarv { to { --bk-neonvinkel: 360deg; } }
+@keyframes bk-neonandning {
+  0%, 100% { opacity: .34; }
+  50%      { opacity: .62; }
+}
+
+/* Utan stod for @property star vinkeln stilla. Da ska ramen anda finnas - som en lugn
+   gron kant - i stallet for att bli en halv effekt som ser trasig ut. */
+@supports not (background: conic-gradient(from var(--bk-neonvinkel), red, blue)) {
+  .atm-machine::after { background: rgba(0,255,127,.5); animation: none; }
+  .atm-machine::before { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atm-machine::after, .atm-machine::before { animation: none; }
 }
