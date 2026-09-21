@@ -533,9 +533,18 @@
 </div>
 
 <!-- ALERTS -->
+<!-- Meddelandena kommer fran TVA hall, och ordningen spelar roll.
+     Flash-attributet forst (snyggast: inget hamnar i adressfaltet), URL-parametern som
+     reserv. Flash bor i sessionen, och i iframen pa elitrobban.se ar sessionskakan en
+     tredjepartskaka - blockeras den forsvinner meddelandet, och med det bade kvittot
+     och sedlarna, eftersom animationerna triggas av .alert-success. -->
 <th:block th:fragment="alerts">
   <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error == null and param.fel != null}"
+       class="alert alert-error"   th:text="${param.fel}"></div>
+  <div th:if="${success == null and param.ok != null}"
+       class="alert alert-success" th:text="${param.ok}"></div>
 </th:block>
 
 </body>

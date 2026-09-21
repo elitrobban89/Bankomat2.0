@@ -289,9 +289,13 @@
       try { sessionStorage.setItem(NYCKEL, '1'); } catch (e) {}
       // Overlamningen: maskinen satter i kortet nar lagret lyfter. Kallet ar vaktat med
       // flit - splashen ska fungera aven om fragments-skriptet inte hunnit definiera det.
+      // Kortet ska INTE aka in i samma andetag som lagret lyfter. Da har besokaren aldrig
+      // sett skarmen den just slappte: "Satt in ditt kort" med kortmarkena stod bakom
+      // splashen hela tiden, och forsvann i samma sekund den forsvann. Pausen ar hela
+      // poangen - maskinen ber om kortet, man hinner lasa, och sedan kommer det.
       timers.push(setTimeout(function () {
         try { if (window.atmSattInKort) window.atmSattInKort(); } catch (e) {}
-      }, 900));
+      }, 4200));
       timers.push(setTimeout(function () {
         lager.classList.add('bk-ut');
         setTimeout(function () {

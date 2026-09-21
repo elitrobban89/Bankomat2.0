@@ -1,5 +1,7 @@
 package bank;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -12,6 +14,24 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class BankController {
 
     private static final Logger log = LoggerFactory.getLogger(BankController.class);
+
+    /**
+     * Bygger en omdirigering med meddelandet i URL:EN i stallet for i sessionen.
+     *
+     * <p>Flash-attribut bor i sessionen, och appen kors i en iframe fran elitrobban.se.
+     * Sessionskakan ar darfor en tredjepartskaka: blockeras den far varje anrop en ny tom
+     * session och meddelandet ar borta nar omdirigeringen landar. Resultatet ar en maskin
+     * som ser ut att inte gora nagonting - inget fel, inget kvitto och inga sedlar,
+     * eftersom bada animationerna triggas av kvittensrutan - medan pengarna anda flyttas.
+     *
+     * <p>Flash-attributet satts fortfarande (det ger en ren URL nar kakan gar fram);
+     * det har ar reserven som klarar sig utan bade kaka och session.
+     */
+    private static String medMeddelande(String sokvag, String nyckel, String text) {
+        String avskiljare = sokvag.contains("?") ? "&" : "?";
+        return sokvag + avskiljare + nyckel + "="
+                + URLEncoder.encode(text, StandardCharsets.UTF_8);
+    }
 
     private final BankService bankService;
     private final Systeminfo systeminfo;
@@ -155,10 +175,13 @@ public class BankController {
         try {
             bankService.deposit(kontonr, belopp, ocr);
             ra.addFlashAttribute("success", "Insättning på " + belopp + " kr genomförd.");
+            return "redirect:" + medMeddelande("/kontohantering?kontonr=" + kontonr,
+                    "ok", "Insättning på " + belopp + " kr genomförd.");
         } catch (BankException e) {
             ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:" + medMeddelande("/kontohantering?kontonr=" + kontonr,
+                    "fel", e.getMessage());
         }
-        return "redirect:/kontohantering?kontonr=" + kontonr;
     }
 
     @PostMapping("/kontohantering/uttag")
@@ -169,10 +192,13 @@ public class BankController {
         try {
             bankService.withdraw(kontonr, belopp, ocr);
             ra.addFlashAttribute("success", "Uttag på " + belopp + " kr genomfört.");
+            return "redirect:" + medMeddelande("/kontohantering?kontonr=" + kontonr,
+                    "ok", "Uttag på " + belopp + " kr genomfört.");
         } catch (BankException e) {
             ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:" + medMeddelande("/kontohantering?kontonr=" + kontonr,
+                    "fel", e.getMessage());
         }
-        return "redirect:/kontohantering?kontonr=" + kontonr;
     }
 
     @PostMapping("/kontohantering/overforing")
