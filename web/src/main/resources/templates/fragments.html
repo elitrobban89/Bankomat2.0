@@ -175,6 +175,19 @@
         }, 66);
       }
 
+      // Kortremsan pa valkomstskarmen ar det maskinen visar INNAN ett kort ar isatt -
+      // "Satt in ditt kort" ska inte sta kvar under en session dar kortet redan ligger i
+      // lasaren. Flaggan bor i sessionStorage och inte i en variabel: appen laddar om sidan
+      // vid varje menyval, sa ett minne som bara lever i JS hade glomt kortet direkt.
+      var KORT_NYCKEL = 'atmKortIsatt';
+      function doljKortremsa(direkt) {
+        var el = document.querySelector('.card-accept');
+        if (!el) return;
+        if (direkt) { el.style.display = 'none'; return; }   // vid omladdning: ingen blink
+        el.classList.add('kort-in');
+        setTimeout(function () { el.style.display = 'none'; }, 500);
+      }
+
       // Kortet glider in i kortläsaren
       function insertCardAnim() {
         var outer = document.querySelector('.card-slot-outer');
@@ -183,6 +196,8 @@
         card.className = 'insert-card';
         outer.appendChild(card);
         outer.classList.add('inserting');
+        try { sessionStorage.setItem(KORT_NYCKEL, '1'); } catch (e) {}
+        doljKortremsa();
         setTimeout(function () {
           card.remove();
           outer.classList.remove('inserting');
@@ -394,7 +409,14 @@
         }
       }
 
+      // Uppstartsskarmen (splash.js) ersatter BIOS-sekvensen nar den kor, och da skulle
+      // kortet aldrig ga in - remsan "Satt in ditt kort" hade legat kvar for alltid. Den
+      // far darfor lamna over hit nar den lyfter: kortet glider in i den lysande lasaren
+      // och remsan tonar ut, vilket ar exakt vad splashens sista rad lovade.
+      window.atmSattInKort = insertCardAnim;
+
       document.addEventListener('DOMContentLoaded', function () {
+        try { if (sessionStorage.getItem(KORT_NYCKEL)) doljKortremsa(true); } catch (e) {}
         fitAtm();
         crtSetup();
         matrixRain();

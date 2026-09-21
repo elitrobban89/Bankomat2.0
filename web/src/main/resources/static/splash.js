@@ -287,6 +287,11 @@
       if (cur) cur.style.display = 'none';
       document.documentElement.style.overflow = forraOverflow;
       try { sessionStorage.setItem(NYCKEL, '1'); } catch (e) {}
+      // Overlamningen: maskinen satter i kortet nar lagret lyfter. Kallet ar vaktat med
+      // flit - splashen ska fungera aven om fragments-skriptet inte hunnit definiera det.
+      timers.push(setTimeout(function () {
+        try { if (window.atmSattInKort) window.atmSattInKort(); } catch (e) {}
+      }, 600));
       timers.push(setTimeout(function () {
         lager.classList.add('bk-ut');
         setTimeout(function () {
