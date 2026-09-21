@@ -2,7 +2,9 @@
 <!-- Bankomat — (c) 2026 Robert Andersson Kopler. Alla rattigheter forbehallna. -->
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Meny')}"></head>
-<body>
+<!-- Talen lases av splash.js till kontoraden. th:attr utan varde ger inget attribut alls,
+     sa saknas siffrorna visar splashen raden utan dem i stallet for med en nolla. -->
+<body th:attr="data-konton=${antalKonton},data-kunder=${antalKunder},data-db=${databas},data-boot=${springBoot},data-java=${javaVersion}">
 <div class="atm-machine">
   <div th:replace="~{fragments :: atm-top}"></div>
   <div class="atm-mid">
@@ -17,6 +19,33 @@
         <a class="menu-btn" th:href="@{/registervard}">Registervård</a>
         <a class="menu-btn" th:href="@{/kontohantering}">Kontohantering</a>
         <a class="menu-btn secondary" th:href="@{/kontoversikt}">Kontoöversikt</a>
+
+        <!-- Kortremsan: det maskinen visar INNAN ett kort ar isatt. Ikonen ar ett kort med
+             chip, ritat i samma grona fosfor som resten av skarmen. Markena ar textsatta i
+             maskinens egen skrift och inte inklistrade logotyper - varumarken tillhor nagon
+             annan, och en gronmonokrom CRT hade anda inte visat dem i sina farger. -->
+        <div class="card-accept">
+          <div class="card-accept-vanster">
+            <svg class="kort-glas" width="30" height="21" viewBox="0 0 30 21" aria-hidden="true">
+              <rect x=".8" y=".8" width="28.4" height="19.4" rx="2.6" fill="rgba(0,255,127,.09)"
+                    stroke="#00ff7f" stroke-width="1.1"/>
+              <rect x="3.4" y="6.2" width="6.4" height="5" rx="1" fill="rgba(0,255,127,.55)"/>
+              <path d="M3.4 8.7h6.4M6.6 6.2v5" stroke="#021c0c" stroke-width=".7"/>
+              <path d="M13.5 7.5h13M13.5 11h9" stroke="rgba(0,255,127,.65)" stroke-width="1.1"
+                    stroke-linecap="round"/>
+              <path d="M3.4 15.4h23.2" stroke="rgba(0,255,127,.3)" stroke-width="1.6"/>
+            </svg>
+            <span>
+              <b>Sätt in ditt kort</b>
+              <i>Please insert your card · chip uppåt</i>
+            </span>
+          </div>
+          <div class="card-marks">
+            <span class="card-mark">Visa</span>
+            <span class="card-mark">Mastercard</span>
+            <span class="card-mark">Maestro</span>
+          </div>
+        </div>
       </div>
     </div>
     <div th:replace="~{fragments :: atm-side-right}"></div>

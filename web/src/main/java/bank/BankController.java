@@ -1,5 +1,7 @@
 package bank;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -9,16 +11,35 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class BankController {
 
-    private final BankService bankService;
+    private static final Logger log = LoggerFactory.getLogger(BankController.class);
 
-    public BankController(BankService bankService) {
+    private final BankService bankService;
+    private final Systeminfo systeminfo;
+
+    public BankController(BankService bankService, Systeminfo systeminfo) {
         this.bankService = bankService;
+        this.systeminfo = systeminfo;
     }
 
     // ─── Meny ────────────────────────────────────────────────────────────────
 
+    /**
+     * Startsidan. Siffrorna gar med till vyn for uppstartsskarmens sista rad: den ska visa
+     * vad maskinen FAKTISKT ser i registret, inte en pahittad etikett. Halls de tomma nar
+     * databasen strular visar splashen raden utan tal i stallet for att ljuga.
+     */
     @GetMapping("/")
-    public String meny() {
+    public String meny(Model model) {
+        try {
+            model.addAttribute("antalKonton", bankService.getAllAccounts().size());
+            model.addAttribute("antalKunder", bankService.getAllPersonNames().size());
+            model.addAttribute("databas", systeminfo.databas());
+            model.addAttribute("springBoot", systeminfo.springBoot());
+            model.addAttribute("javaVersion", systeminfo.java());
+        } catch (Exception e) {
+            // Menyn ska fungera aven om registret inte svarar - splashen hoppar over talen.
+            log.warn("Kunde inte rakna konton till uppstartsskarmen: {}", e.getMessage());
+        }
         return "meny";
     }
 

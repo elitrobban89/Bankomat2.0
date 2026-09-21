@@ -24,6 +24,12 @@ class BankControllerTest {
     @MockBean
     private BankService bankService;
 
+    // Startsidan hamtar databasnamn och Spring Boot-version till uppstartsskarmen. Utan den
+    // har mocken saknar @WebMvcTest-skivan bonan (den behover en DataSource) och HELA
+    // kontexten vagrar starta - fyra prov foll pa ett fel som inte hade med dem att gora.
+    @MockBean
+    private Systeminfo systeminfo;
+
     @Test
     void menynRenderas() throws Exception {
         mockMvc.perform(get("/"))
