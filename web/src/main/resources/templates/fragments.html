@@ -108,13 +108,25 @@
         m.style.zoom = '';
         if (window.innerWidth <= 580) return;
         // Läs måtten med zoom avstängd, annars skalas redan skalade mått en gång till.
-        var tillHojd  = (window.innerHeight - 30) / m.offsetHeight;
-        var tillBredd = (window.innerWidth - 24) / m.offsetWidth;
+        //
+        // Luften räknas ur body:s FAKTISKA padding i stället för en gissad 30:a. Med en
+        // hårdkodad 30 mot en padding på 20 + 40 blev dokumentet exakt 30 px högre än
+        // fönstret i varje fönsterstorlek jag mätte — alltid en rullningslist, alltid
+        // några pixlar av maskinens underkant utanför. Läses talet ur CSS:en kan de två
+        // inte glida isär nästa gång någon ändrar paddingen.
+        var kropp     = getComputedStyle(document.body);
+        var luftY     = parseFloat(kropp.paddingTop) + parseFloat(kropp.paddingBottom);
+        var luftX     = parseFloat(kropp.paddingLeft) + parseFloat(kropp.paddingRight);
+        var tillHojd  = (window.innerHeight - luftY) / m.offsetHeight;
+        var tillBredd = (window.innerWidth - luftX) / m.offsetWidth;
         var skala = Math.min(tillHojd, tillBredd, ATM_MAX_ZOOM);
         if (skala < 0.99 || skala > 1.01) m.style.zoom = skala;
       }
       window.addEventListener('resize', fitAtm);
       window.addEventListener('load', fitAtm);
+      // Share Tech Mono byter höjd på hela maskinen när den landar. Skalas det före bytet
+      // räknas det på fallback-typsnittets mått, och resultatet stämmer inte med det man ser.
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAtm);
 
       var reduceMotion = window.matchMedia &&
           window.matchMedia('(prefers-reduced-motion: reduce)').matches;
