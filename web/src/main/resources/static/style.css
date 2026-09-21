@@ -86,7 +86,12 @@ body {
     linear-gradient(180deg, #164058 0%, #0c2839 100%);
   border-radius: 22px 22px 0 0;
   box-shadow: inset 0 -1px 0 rgba(0,0,0,.75), 0 1px 0 rgba(var(--hus-ljus),.07);
-  padding: 30px 32px 20px;   /* mer luft OVER rubriken an under */
+  /* Servicespalten sitter till hoger i mitten-raden, men toppanelen spanner over HELA
+     maskinen. Centrerades rubriken mot ladan hamnade den darfor till hoger om skarmens
+     mitt - synligt snett sa fort man drog en lodrat linje. Panelen far samma insats till
+     hoger som spalten ar bred, sa rubriken och underrubriken star mitt over displayen. */
+  padding: 30px 32px 20px;
+  padding-right: calc(32px + 108px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -145,20 +150,39 @@ body {
   box-shadow: inset 0 3px 8px rgba(0,0,0,.9);
   animation: slot-glow 2.4s ease-in-out infinite;
 }
+/* Den tanda ramen runt oppningen: en gron kant plus sken utat. Det ar HAR ljuset bor,
+   sa att halet i mitten kan vara svart och anda synas pa langt hall. */
+.atm-service .card-slot-housing {
+  border-color: rgba(0,255,127,.45);
+  background: #000;
+  box-shadow:
+    inset 0 3px 8px rgba(0,0,0,1),
+    inset 0 0 10px rgba(0,255,127,.28),
+    0 0 14px rgba(0,255,127,.4),
+    0 0 34px rgba(0,255,127,.16);
+}
 
 /* Sjalva springan ar UPPLYST, inte bara gronaktig: pa en riktig Bankomat lyser
    kortlasaren klart gront med lameller bakom oppningen, och det ar det ljuset som
    sager "har ska kortet in" innan man last en enda rad text. Lamellerna ar en
    repeating-linear-gradient i bakgrunden - inte ett ::after ovanpa, som hade tvattat
    ur springan (samma fall som glasgloden pa elbilskorten). */
+/* Sjalva springan ar ETT HAL, inte en lampa. Forst var den en lysande gron stapel och
+   sag darfor ut som en indikator man inte kan rora - inte som nagot man stoppar ett kort
+   i. Nu ar oppningen svart med djup, och ljuset ligger som en tand RAM runt den (box-shadow
+   utat pa holjet + en inre ljusrand i over- och underkant), precis som lysdioderna kring
+   kortinkastet pa en riktig maskin. */
 .card-slot-slit {
   width: 130px;
-  height: 7px;
-  background:
-    repeating-linear-gradient(90deg, rgba(0,0,0,.55) 0 2px, transparent 2px 6px),
-    linear-gradient(90deg, #0a5a28, #2bff8f 50%, #0a5a28);
+  height: 9px;
   border-radius: 2px;
-  box-shadow: 0 0 10px rgba(0,255,127,.6), inset 0 0 4px rgba(255,255,255,.35);
+  background:
+    linear-gradient(180deg, rgba(0,255,127,.55) 0 1.5px, transparent 1.5px),
+    linear-gradient(0deg, rgba(0,255,127,.4) 0 1.5px, transparent 1.5px),
+    linear-gradient(180deg, #000 0%, #020c05 45%, #000 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,1),
+    0 0 6px rgba(0,255,127,.35);
   animation: slit-glow 2.4s ease-in-out infinite;
 }
 
@@ -169,11 +193,11 @@ body {
              box-shadow: inset 0 3px 8px rgba(0,0,0,.9), 0 0 16px rgba(0,255,127,.45); }
 }
 
+/* Pulsen ligger i RAMENS ljus, inte i hela springans ljusstyrka: det ar lysdioderna runt
+   oppningen som andas, medan halet i mitten forblir svart. */
 @keyframes slit-glow {
-  0%, 100% { box-shadow: 0 0 9px rgba(0,255,127,.5), inset 0 0 4px rgba(255,255,255,.3);
-             filter: brightness(.92); }
-  50%      { box-shadow: 0 0 22px rgba(0,255,127,.95), inset 0 0 6px rgba(255,255,255,.5);
-             filter: brightness(1.15); }
+  0%, 100% { box-shadow: inset 0 2px 4px rgba(0,0,0,1), 0 0 5px rgba(0,255,127,.3); }
+  50%      { box-shadow: inset 0 2px 4px rgba(0,0,0,1), 0 0 12px rgba(0,255,127,.65); }
 }
 
 .card-slot-label {
@@ -453,6 +477,11 @@ body {
   gap: 24px;
   align-items: center;
   border-radius: 0 0 14px 14px;
+  /* Numpaden ska sta mitt under uttagsfacket. Forut centrerades numpad OCH
+     funktionstangenter som ett block, vilket sköt siffrorna at vanster om mitten -
+     de laste som snett placerade under facket. Funktionstangenterna lyfts darfor ur
+     flodet och hangs pa hogersidan. */
+  position: relative;
 }
 
 .keypad-grid {
@@ -531,6 +560,10 @@ body {
 }
 
 .special-keys {
+  position: absolute;
+  right: 14%;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -1174,11 +1207,15 @@ details.accordion > summary:hover { background: rgba(0,60,20,.2); }
 /* ══════════════════════════════════════════
    AMBIENT: matrix rain + glow pulse
 ══════════════════════════════════════════ */
+/* Sifferregnet tappade synlighet nar maskinen blev bredare (660 -> 760 px) och huset
+   ljusare: falten vid sidorna blev smalare SAMTIDIGT som kontrasten mot bakgrunden
+   minskade. Bade duken och sjalva tecknen ar ljusare nu - det ar tva reglage och bada
+   behovdes, .5 x 0.32 gav knappt 0,16 i faktisk alfa. */
 .matrix-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
-  opacity: .5;
+  opacity: .85;
   pointer-events: none;
 }
 
@@ -1449,8 +1486,8 @@ body::before {
   position: absolute;
   top: 100%;
   left: 50%;
-  width: 112px;
-  margin-left: -56px;
+  width: 88px;
+  margin-left: -44px;
   height: 170px;
   overflow: hidden;
   pointer-events: none;
@@ -1497,31 +1534,38 @@ body::before {
 .card-slot-outer { position: relative; }
 .card-slot-housing { position: relative; z-index: 2; }
 
+/* Kortet kommer NERIFRAN och gar UPPAT in i lasaren, med chipet som ledande kant.
+   Forut foll det ned uppifran och passerade springan - det ar inte sa man satter i ett
+   kort, och det motsade dessutom skylten bredvid som sager "chip uppat". Bredden ar
+   satt strax under springans 88 px: ett kort som ar bredare an sin egen oppning ser
+   ut att aka in genom platen. */
 .insert-card {
   position: absolute;
-  top: -58px;
+  top: 30px;
   left: 50%;
-  width: 104px;
-  height: 62px;
-  margin-left: -52px;
+  width: 84px;
+  height: 52px;
+  margin-left: -42px;
   border-radius: 6px;
   background: linear-gradient(135deg, #0a3a1a 0%, #062610 60%, #041c0c 100%);
   border: 1px solid #1a5a30;
   box-shadow: 0 0 14px rgba(0,255,80,.3);
   z-index: 1;
   opacity: 0;
-  animation: card-insert 2.3s ease-in .2s forwards;
+  animation: card-insert 2.3s ease-out .2s forwards;
   pointer-events: none;
 }
 
 /* chip + magnet stripe on the card */
+/* Chipet sitter i OVERKANTEN eftersom det ar den kanten som gar in forst. Guldtonen
+   ar den enda varma faran pa kortet, sa ogat foljer den in i springan. */
 .insert-card::before {
   content: '';
   position: absolute;
-  top: 12px;
-  left: 12px;
-  width: 20px;
-  height: 14px;
+  top: 7px;
+  left: 11px;
+  width: 17px;
+  height: 12px;
   border-radius: 3px;
   background: linear-gradient(135deg, #aad890, #5a9850);
   opacity: .8;
@@ -1530,8 +1574,8 @@ body::before {
 .insert-card::after {
   content: 'BANKOMAT 2.0';
   position: absolute;
-  bottom: 7px;
-  left: 12px;
+  bottom: 6px;
+  left: 10px;
   color: var(--grn);
   font-size: 7px;
   letter-spacing: 1px;
@@ -1539,10 +1583,14 @@ body::before {
 }
 
 @keyframes card-insert {
-  0%   { transform: translateY(-14px); opacity: 0; }
-  18%  { transform: translateY(0);     opacity: 1; }
-  75%  { transform: translateY(46px);  opacity: 1; }
-  100% { transform: translateY(62px);  opacity: 0; }
+  /* Nerifran och upp. Kortet blir synligt forst NEDANFOR spalten, glider upp mot
+     springan och slukas dar - overkanten nar lasaren vid ~72 %, och resten av vagen
+     ar det pa vag in i maskinen. */
+  0%   { transform: translateY(40px);  opacity: 0; }
+  14%  { transform: translateY(26px);  opacity: 1; }
+  72%  { transform: translateY(-14px); opacity: 1; }
+  90%  { transform: translateY(-30px); opacity: .45; }
+  100% { transform: translateY(-40px); opacity: 0; }
 }
 
 .card-slot-outer.inserting .card-slot-slit {
@@ -1565,17 +1613,20 @@ body::before {
   transition: all .2s;
 }
 
+/* Sedlarna var sa sma och morka att ett uttag kunde passera obemarkt - anvandaren sa
+   rakt ut att inga pengar kom. De ar storre och ljusare nu; det ar det enda kvittot pa
+   att maskinen gjorde nagot. */
 .bill {
   position: absolute;
   top: 16px;
-  width: 46px;
-  height: 22px;
+  width: 62px;
+  height: 30px;
   border-radius: 2px;
-  background: linear-gradient(135deg, #0d4d20 0%, #073012 100%);
-  border: 1px solid #2a8a4a;
-  box-shadow: 0 0 10px rgba(0,255,80,.35);
-  color: var(--grn);
-  font-size: 9px;
+  background: linear-gradient(135deg, #14803a 0%, #0a4a1e 100%);
+  border: 1px solid #45d97a;
+  box-shadow: 0 0 16px rgba(0,255,80,.6), inset 0 1px 0 rgba(255,255,255,.18);
+  color: #d6ffe6;
+  font-size: 11px;
   font-weight: bold;
   letter-spacing: 1px;
   display: flex;
@@ -1747,8 +1798,10 @@ body::before {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 22px;
+  /* Kvittot hogst upp, kortlasaren en bit NED mot mitten och id-platen i botten -
+     samma ordning och samma luft som pa maskinen i butiken. */
+  justify-content: flex-start;
+  gap: 0;
   padding: 10px 8px;
   margin-left: 4px;
   border-radius: 8px;
@@ -1769,6 +1822,8 @@ body::before {
   gap: 5px;
   margin-top: 0;
 }
+.atm-service .receipt-slot { margin-top: 6px; }
+.atm-service .card-slot-outer { margin-top: 26%; }
 /* Oppningarna ligger LODRATT nu och maste smalna: den gamla bredden var satt for en
    fascia pa 660 px. Halls de kvar spranger de spalten och skarmen far betala i bredd. */
 .atm-service .receipt-housing { width: 84px; }
@@ -1810,6 +1865,7 @@ body::before {
 }
 @media (max-width: 580px) {
   /* Pa mobil far spalten inte ata av skarmen - den laggs under i stallet, sida vid sida. */
+  .atm-top { padding-right: 32px; }
   .atm-hoger { flex-direction: column; }
   .atm-service {
     width: auto;
