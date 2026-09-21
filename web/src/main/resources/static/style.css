@@ -1685,7 +1685,16 @@ body::before {
     display: block;
   }
 
-  .screen-main { padding: 14px 12px; overflow: visible; }
+  /* Utzoomat skarminnehall: mindre text och tatare rader far in mer i den yta som
+     faktiskt syns. Talen ar satta i em dar det gar, sa en enda andring av .screen-main
+     skalar hela innehallet i stallet for att behova jagas i tio regler. */
+  .screen-main { padding: 11px 10px; overflow: visible; font-size: .88em; }
+  .menu-btn { padding: 10px 14px; font-size: 12px; margin-bottom: 6px; }
+  .screen-welcome h2 { font-size: 12.5px; }
+  .screen-welcome p  { font-size: 9px; }
+  .card-accept { margin-top: 10px; padding-top: 8px; }
+  .card-accept b { font-size: 10px; }
+  .card-accept i { font-size: 7.5px; }
 
   /* Knappsatsen visas på mobil — touch-optimerad. Numpaden överst, funktions-
      tangenterna (AVBRYT/RENSA/OK) som en rad under, så inget hamnar utanför skärmen.
@@ -1701,23 +1710,30 @@ body::before {
     background: #040804;
     box-shadow: 0 -10px 26px rgba(0,0,0,.65);
   }
-  .atm-screen { padding-bottom: 300px; }
+  /* Luften nederst ska motsvara panelen som ligger over, varken mer eller mindre:
+     for lite och sista raden hamnar bakom knappsatsen, for mycket och skarmen slutar
+     med ett tomt falt man maste rulla forbi. Panelen ar ~215 px efter krympningen. */
+  .atm-screen { padding-bottom: 225px; }
 
   .atm-keypad-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    padding: 14px 12px calc(16px + env(safe-area-inset-bottom, 0px));
+    gap: 7px;
+    padding: 9px 12px calc(10px + env(safe-area-inset-bottom, 0px));
   }
   .keypad-grid {
     width: 100%;
-    max-width: 186px;
+    max-width: 156px;
     grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    padding: 8px;
+    gap: 4px;
+    padding: 6px;
   }
-  .num-key { width: auto; height: 32px; font-size: 14px; border-radius: 4px; }
+  /* Tangenterna var satta for att vara lattraffade (~52 px totalt per knapp). Det tog
+     290 px av en 844 px hog telefon, alltsa mer an en tredjedel av vyn till en knappsats
+     man sallan anvander - skarmen ar det man laser. 26 px ar fortfarande over Apples och
+     Googles minsta rekommenderade traffyta nar radavstandet raknas med. */
+  .num-key { width: auto; height: 26px; font-size: 12px; border-radius: 4px; }
   .keypad-grid .num-key:nth-child(5)::after { bottom: 4px; width: 4px; height: 4px; }
   .special-keys {
     /* Datorvyn hanger tangenterna ABSOLUT bredvid numpaden. Den positioneringen foljer
@@ -1733,7 +1749,7 @@ body::before {
     max-width: 186px;
     gap: 5px;
   }
-  .sp-key { flex: 1 1 0; width: auto; height: 30px; font-size: 8px; border-radius: 5px; }
+  .sp-key { flex: 1 1 0; width: auto; height: 25px; font-size: 7.5px; border-radius: 5px; }
 
   .atm-cash-slot { border-radius: 0; }
 
