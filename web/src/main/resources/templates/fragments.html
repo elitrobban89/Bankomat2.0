@@ -131,7 +131,9 @@
         var m = document.querySelector('.atm-machine');
         if (!m) return;
         m.style.zoom = '';
-        if (window.innerWidth <= 580) return;
+        // Skalar aven pa telefon. Forut hoppade den over mobil eftersom mobilen hade en
+        // EGEN layout - nu ar det samma maskin overallt, och det ar just skalningen som
+        // far hela ramen att rymmas pa en liten skarm.
         // Läs måtten med zoom avstängd, annars skalas redan skalade mått en gång till.
         //
         // Luften räknas ur body:s FAKTISKA padding i stället för en gissad 30:a. Med en
@@ -142,8 +144,18 @@
         var kropp     = getComputedStyle(document.body);
         var luftY     = parseFloat(kropp.paddingTop) + parseFloat(kropp.paddingBottom);
         var luftX     = parseFloat(kropp.paddingLeft) + parseFloat(kropp.paddingRight);
-        var tillHojd  = (window.innerHeight - luftY) / m.offsetHeight;
-        var tillBredd = (window.innerWidth - luftX) / m.offsetWidth;
+        // MATS MOT documentElement.clientWidth, INTE window.innerWidth.
+        //
+        // Maskinen ar bredare an en telefon innan den skalats. Nar sidan da svammar over
+        // blaser mobil-Chrome upp layoutviewporten for att fa in innehallet, och
+        // window.innerWidth borjar rapportera 583 px pa en 390 px telefon. fitAtm raknade
+        // alltsa mot ett matt som INTE fanns, kom fram till 0,75 i stallet for 0,49, och
+        // lamnade maskinen 95 px bredare an skarmen. clientWidth ar layoutviewporten och
+        // paverkas inte av overspillet.
+        var vyBredd = document.documentElement.clientWidth || window.innerWidth;
+        var vyHojd  = document.documentElement.clientHeight || window.innerHeight;
+        var tillHojd  = (vyHojd - luftY) / m.offsetHeight;
+        var tillBredd = (vyBredd - luftX) / m.offsetWidth;
         var skala = Math.min(tillHojd, tillBredd, ATM_MAX_ZOOM);
         if (skala < 0.99 || skala > 1.01) m.style.zoom = skala;
       }
@@ -167,7 +179,10 @@
 
       // Matrix-regn bakom maskinen
       function matrixRain() {
-        if (reduceMotion || window.innerWidth <= 580) return;
+        // Regnet kors aven pa telefon numera: mobilen visar samma maskin som datorn, och
+        // da hor bakgrunden till bilden. Forr hade mobilen en egen layout som fyllde hela
+        // skarmen, och da fanns ingen bakgrund att se.
+        if (reduceMotion) return;
         var cv = document.createElement('canvas');
         cv.className = 'matrix-bg';
         document.body.appendChild(cv);

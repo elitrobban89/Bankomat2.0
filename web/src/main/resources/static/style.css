@@ -1448,6 +1448,11 @@ body::before {
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  /* Kvittot hanger ned OVER spalten nar det matas ut, och kortlasaren under ligger pa
+     z-index 2. Utan ett eget lager har ritades slitsen och texten "SATT I KORT" rakt
+     igenom papperet - det sag ut som att kvittot skar in i maskinen. Papper framfor plat. */
+  position: relative;
+  z-index: 20;
 }
 
 .receipt-housing {
@@ -1467,7 +1472,7 @@ body::before {
 }
 
 .receipt-slit {
-  width: 90px;
+  width: calc(var(--kvittobredd, 108px) - 18px);
   height: 3px;
   background: #000;
   border-radius: 1px;
@@ -1490,11 +1495,15 @@ body::before {
   position: absolute;
   top: 100%;
   left: 50%;
-  width: 88px;
-  margin-left: -44px;
+  width: var(--kvittobredd, 88px);
+  margin-left: calc(var(--kvittobredd, 88px) / -2);
   height: 170px;
   overflow: hidden;
   pointer-events: none;
+  /* Papper framfor plat. Etiketten KVITTO har opacity:.6 och far darmed en egen
+     staplingskontext - utan ett lager har malades ordet rakt igenom papperets forsta
+     rad, och kortlasaren under stack upp genom arket. */
+  z-index: 6;
 }
 
 .receipt-paper {
@@ -1503,8 +1512,8 @@ body::before {
   font-family: inherit;
   font-size: 8px;
   line-height: 1.7;
-  letter-spacing: .5px;
-  padding: 8px 9px 12px;
+  letter-spacing: .2px;
+  padding: 8px 7px 12px;
   white-space: pre;
   box-shadow: 0 4px 14px rgba(0,0,0,.7);
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px),
@@ -1660,161 +1669,7 @@ body::before {
 /* ══════════════════════════════════════════
    RESPONSIVE / MOBILE
 ══════════════════════════════════════════ */
-@media (max-width: 580px) {
-  /* Luft runt maskinen sa ramen syns. Var 0 forut, och da lag maskinen kant i kant med
-     telefonen - man sag en skarm, inte en bankomat. */
-  body { padding: 7px 7px 0; background: #020402; }
 
-  .atm-machine {
-    /* Horn och skuggor KVAR pa mobil - det ar de som gor att den laser som ett foremal
-       med kanter. Hojden lamnar plats for luften ovanfor och for den fasta panelen. */
-    border-radius: 16px 16px 12px 12px;
-    min-height: calc(100vh - 7px);
-    /* Kolumn sa mittensektionen kan VAXA och fylla ut hojden. Utan det slutade
-       innehallet dar skarmen tog slut och resten av maskinen blev ett tomt falt. */
-    display: flex;
-    flex-direction: column;
-  }
-  .atm-mid { flex: 1 1 auto; }
-
-  .atm-top { border-radius: 14px 14px 0 0; padding: 12px 16px 10px; }
-  .atm-brand { font-size: 16px; letter-spacing: 4px; }
-  .receipt-slot, .status-lamp .lamp-label { display: none; }
-  .status-lamp { top: 14px; left: 14px; }
-  .matrix-bg { display: none; }
-
-  .atm-side { display: none; }
-
-  .atm-screen {
-    border-radius: 5px;
-    margin-left: 5px;
-    height: auto;
-    display: block;
-  }
-
-  /* Utzoomat skarminnehall: mindre text och tatare rader far in mer i den yta som
-     faktiskt syns. Talen ar satta i em dar det gar, sa en enda andring av .screen-main
-     skalar hela innehallet i stallet for att behova jagas i tio regler. */
-  .screen-main { padding: 8px 7px; overflow: visible; font-size: .76em; }
-  .menu-btn { padding: 8px 10px; font-size: 10.5px; margin-bottom: 5px; }
-  .screen-welcome h2 { font-size: 11.5px; }
-  .screen-welcome p  { font-size: 8.5px; }
-  .card-accept { margin-top: 10px; padding-top: 8px; }
-  .card-accept b { font-size: 10px; }
-  .card-accept i { font-size: 7.5px; }
-
-  /* Knappsatsen visas på mobil — touch-optimerad. Numpaden överst, funktions-
-     tangenterna (AVBRYT/RENSA/OK) som en rad under, så inget hamnar utanför skärmen.
-     Behåller den borstade stål-looken men skalar upp för fingrar (~52px höjd). */
-  /* Fäst nedre sektionen (uttagsfack + knappsats) längst ner i vyn så knappsatsen
-     sitter på EXAKT samma ställe i varje meny — i stället för att hoppa med hur mycket
-     text varje vy har. Skärmen får padding-bottom så sista status-/resultattexten
-     alltid kan scrollas fram ovanför panelen och aldrig döljs bakom den. */
-  .atm-bottom-wrapper {
-    position: fixed;
-    /* Foljer ramen in - annars sticker den fasta panelen ut i kanterna dar maskinen
-       slutar, och ramen ser bruten ut precis dar ogat vilar. */
-    left: 7px; right: 7px; bottom: 0;
-    border-radius: 0 0 12px 12px;
-    z-index: 30;
-    background: #040804;
-    box-shadow: 0 -10px 26px rgba(0,0,0,.65);
-  }
-  /* Luften nederst ska motsvara panelen som ligger over, varken mer eller mindre:
-     for lite och sista raden hamnar bakom knappsatsen, for mycket och skarmen slutar
-     med ett tomt falt man maste rulla forbi. Panelen ar ~215 px efter krympningen. */
-  /* Luften nederst motsvarar REMSAN i menylage. Nar knappsatsen ar uppe vaxer den, sa
-     sista raden aldrig hamnar bakom tangenterna. Talen hanger ihop med panelens hojd -
-     andras den ena maste det andra folja med. */
-  .atm-screen { padding-bottom: 92px; transition: padding-bottom .28s ease; }
-  body.bk-knappsats .atm-screen { padding-bottom: 250px; }
-
-  /* Remsan: uttagsfacket och knappen. Knappsatsen ligger hopfalld under. */
-  .knappsats-knapp {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin: 0 auto 6px;
-    padding: 5px 14px;
-    border-radius: 999px;
-    border: 1px solid rgba(0,255,127,.35);
-    background: rgba(0,255,127,.09);
-    color: var(--txt);
-    font-family: inherit;
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0,255,127,.18);
-  }
-  .knappsats-knapp .knappsats-ikon { font-size: 12px; line-height: 1; }
-  body.bk-knappsats .knappsats-knapp {
-    border-color: rgba(0,255,127,.6);
-    background: rgba(0,255,127,.18);
-    color: var(--txt-hi);
-  }
-
-  /* Sjalva hopfallningen. max-height och inte display:none - det senare gar inte att
-     animera, och en knappsats som bara blinkar fram laser som ett fel. */
-  .atm-keypad-section {
-    max-height: 0;
-    opacity: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    overflow: hidden;
-    transition: max-height .28s ease, opacity .2s ease, padding .28s ease;
-  }
-  body.bk-knappsats .atm-keypad-section {
-    max-height: 220px;
-    opacity: 1;
-    padding: 9px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .atm-keypad-section, .atm-screen { transition: none; }
-  }
-
-  .atm-keypad-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-  }
-  .keypad-grid {
-    width: 100%;
-    max-width: 156px;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    padding: 6px;
-  }
-  /* Tangenterna var satta for att vara lattraffade (~52 px totalt per knapp). Det tog
-     290 px av en 844 px hog telefon, alltsa mer an en tredjedel av vyn till en knappsats
-     man sallan anvander - skarmen ar det man laser. 26 px ar fortfarande over Apples och
-     Googles minsta rekommenderade traffyta nar radavstandet raknas med. */
-  .num-key { width: auto; height: 26px; font-size: 12px; border-radius: 4px; }
-  .keypad-grid .num-key:nth-child(5)::after { bottom: 4px; width: 4px; height: 4px; }
-  .special-keys {
-    /* Datorvyn hanger tangenterna ABSOLUT bredvid numpaden. Den positioneringen foljer
-       med hit om den inte nollas, och da hamnar AVBRYT/RENSA/OK utanfor skarmkanten -
-       pa mobil ligger de i stallet som en rad UNDER numpaden. */
-    position: static;
-    transform: none;
-    left: auto;
-    right: auto;
-    top: auto;
-    flex-direction: row;
-    width: 100%;
-    max-width: 186px;
-    gap: 5px;
-  }
-  .sp-key { flex: 1 1 0; width: auto; height: 25px; font-size: 7.5px; border-radius: 5px; }
-
-  .atm-cash-slot { border-radius: 0; }
-
-  .btn-row-2 { flex-direction: column; }
-  .search-row { flex-direction: column; }
-}
 
 /* ── Kortremsan pa valkomstskarmen ────────────────────────────────────────────
    Pa en riktig Bankomat star "Satt in ditt kort" med en list under skarmen dar de
@@ -1873,9 +1728,7 @@ body::before {
     inset 0 1px 0 rgba(255,255,255,.7);
   flex-shrink: 0;
 }
-@media (max-width: 580px) {
-  .card-accept { justify-content: center; }
-}
+
 
 /* ── Servicespalt till hoger om displayen ─────────────────────────────────────
    Kvittooppningen och kortlasaren sitter dar de sitter pa en riktig Bankomat: i en
@@ -1888,7 +1741,11 @@ body::before {
   flex-shrink: 0;
 }
 .atm-service {
-  width: 104px;
+  /* Spaltens bredd bars av kvittots radlangd: 18 tecken far inte kapas av springan de
+     kommer ur. Slitsen, huset och papperet laser alla ur den har variabeln - nar de hade
+     varsitt tal gled de isar och papperet blev bredare an oppningen. */
+  --kvittobredd: 110px;
+  width: 128px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -1920,7 +1777,7 @@ body::before {
 .atm-service .card-slot-outer { margin-top: 26%; }
 /* Oppningarna ligger LODRATT nu och maste smalna: den gamla bredden var satt for en
    fascia pa 660 px. Halls de kvar spranger de spalten och skarmen far betala i bredd. */
-.atm-service .receipt-housing { width: 84px; }
+.atm-service .receipt-housing { width: var(--kvittobredd); }
 .atm-service .card-slot-housing { width: 88px; height: 24px; }
 .atm-service .card-slot-slit { width: 58px; }   /* kortet ar 52 - det ska GA in, inte klamma */
 /* Etsad platskylt: ljus ovankant och mork underkant gor att texten ser INSTANSAD ut
@@ -1957,45 +1814,7 @@ body::before {
   color: var(--txt-d);
   opacity: .65;
 }
-@media (max-width: 580px) {
-  /* Pa mobil far spalten inte ata av skarmen - den laggs under i stallet, sida vid sida. */
-  .atm-top { padding-right: 32px; }
-  /* Spalten ar ett FLEXBARN till .atm-mid, som ar en RAD. Att bara vanda spaltens egen
-     riktning racker darfor inte: den stod kvar BREDVID skarmen och at 263 av 390 px, sa
-     displayen klamdes ihop till 127 px och blev oläslig. Raden maste brytas - .atm-mid far
-     wrap, och spalten laggs sist pa en egen rad under skarmen. */
-  /* Spalten star BREDVID skarmen har precis som pa dator. Det kravde att den blev smal:
-     104 px bredvid en 390 px telefon lamnade 127 px at displayen, vilket var olasligt.
-     En telefon behover inte samma spalt som en 900 px ram - slitsarna krymper i stallet. */
-  .atm-screen { flex: 1 1 auto; width: auto; min-width: 0; }
-  .atm-hoger {
-    flex: 0 0 auto;
-    flex-direction: row;
-    align-items: stretch;
-  }
-  /* Sidknapparna ar dekor och tar plats som displayen behover battre pa en telefon. */
-  .atm-side { display: none; }
-  .atm-service {
-    width: 62px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0;
-    margin: 0 0 0 3px;
-    padding: 8px 4px;
-  }
-  /* Slitsarna maste folja spaltens bredd - annars spranger de den och ater av skarmen. */
-  .atm-service .receipt-housing { width: 46px; height: 11px; }
-  .atm-service .card-slot-housing { width: 50px; height: 17px; }
-  .atm-service .card-slot-slit { width: 34px; height: 7px; }
-  .atm-service .receipt-label,
-  .atm-service .card-slot-label { font-size: 6px; letter-spacing: .5px; }
-  .atm-service .card-slot-hint { display: none; }
-  .atm-service .card-slot-outer { margin-top: 30%; }
-  .atm-service .receipt-slot,
-  .atm-service .card-slot-outer { margin-top: 0; }
-  .atm-idplat { display: none; }
-}
+
 
 /* ══════════════════════════════════════════
    NEONRAM RUNT MASKINEN
@@ -2081,5 +1900,45 @@ body::before {
    regel med samma specificitet vinner over mediafragan langre upp, och da var knappen
    dold aven pa mobil - dar den ar enda vagen till knappsatsen. */
 @media (min-width: 581px) {
+  .knappsats-knapp { display: none; }
+}
+
+/* ══════════════════════════════════════════
+   MOBIL: SAMMA MASKIN, NEDSKALAD
+   ══════════════════════════════════════════
+   Telefonen har INGEN egen layout langre. Maskinen ritas precis som pa dator och
+   krymps av fitAtm tills den ryms - det ar sa man ser hela ramen, sidknapparna och
+   skarmens nedre kant pa en liten skarm.
+
+   Den forra mobilvyn gjorde tvartom: den strackte ut skarmen och lade knappsatsen
+   fast langst ner sa maskinen alltid fyllde telefonen. Det gav storre text men gjorde
+   att maskinen aldrig tog slut nagonstans - ingen kant, inget slut pa displayen.
+
+   Det enda som ar kvar har ar luften runt om och att knappsatsknappen inte behovs:
+   knappsatsen ar alltid framme i en miniatyr, precis som pa dator. */
+@media (max-width: 580px) {
+  /* AKTA MINIATYR: maskinen behaller datorns layoutbredd och KRYMPS av fitAtm.
+
+     Forsta forsoket lat den krympa till telefonens bredd i stallet - 374 px i stallet for
+     760 - och da trycktes allt ihop: rubriken vaxte in i statuslampan, "VALJ TJANST" brots
+     pa tva rader, menytexten gick fram till pilen. Det ar skillnaden mellan att SKALA och
+     att KLAMMA: skalning behaller varje proportion, klamning bryter dem en i taget.
+
+     Priset ar mindre text (ungefar halva storleken), och det ar vad en miniatyr ar. */
+  body {
+    padding: 10px 8px;
+    align-items: center;
+    overflow-x: hidden;   /* maskinen ar bredare an telefonen INNAN fitAtm hunnit skala */
+  }
+  .atm-machine {
+    width: 760px;
+    max-width: none;
+    flex-shrink: 0;
+  }
+  /* En telefon ar hog och smal, maskinen bred och lag - skalad efter bredden fyllde den
+     bara halva hojden. Hogre skarm ger en hogre maskin, som tar mer av telefonen utan att
+     en enda proportion i layouten andras (skalan styrs anda av bredden). */
+  .atm-screen { height: 760px; }
+  /* Knappsatsen ar alltid synlig i en miniatyr, precis som pa dator. */
   .knappsats-knapp { display: none; }
 }
