@@ -1667,7 +1667,12 @@ body::before {
     border-radius: 0;
     box-shadow: none;
     min-height: 100vh;
+    /* Kolumn sa mittensektionen kan VAXA och fylla ut hojden. Utan det slutade
+       innehallet dar skarmen tog slut och resten av maskinen blev ett tomt falt. */
+    display: flex;
+    flex-direction: column;
   }
+  .atm-mid { flex: 1 1 auto; }
 
   .atm-top { border-radius: 0; padding: 14px 20px 12px; }
   .atm-brand { font-size: 16px; letter-spacing: 4px; }
@@ -1713,7 +1718,56 @@ body::before {
   /* Luften nederst ska motsvara panelen som ligger over, varken mer eller mindre:
      for lite och sista raden hamnar bakom knappsatsen, for mycket och skarmen slutar
      med ett tomt falt man maste rulla forbi. Panelen ar ~215 px efter krympningen. */
-  .atm-screen { padding-bottom: 225px; }
+  /* Luften nederst motsvarar REMSAN i menylage. Nar knappsatsen ar uppe vaxer den, sa
+     sista raden aldrig hamnar bakom tangenterna. Talen hanger ihop med panelens hojd -
+     andras den ena maste det andra folja med. */
+  .atm-screen { padding-bottom: 92px; transition: padding-bottom .28s ease; }
+  body.bk-knappsats .atm-screen { padding-bottom: 250px; }
+
+  /* Remsan: uttagsfacket och knappen. Knappsatsen ligger hopfalld under. */
+  .knappsats-knapp {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 auto 6px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,255,127,.35);
+    background: rgba(0,255,127,.09);
+    color: var(--txt);
+    font-family: inherit;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,255,127,.18);
+  }
+  .knappsats-knapp .knappsats-ikon { font-size: 12px; line-height: 1; }
+  body.bk-knappsats .knappsats-knapp {
+    border-color: rgba(0,255,127,.6);
+    background: rgba(0,255,127,.18);
+    color: var(--txt-hi);
+  }
+
+  /* Sjalva hopfallningen. max-height och inte display:none - det senare gar inte att
+     animera, och en knappsats som bara blinkar fram laser som ett fel. */
+  .atm-keypad-section {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    transition: max-height .28s ease, opacity .2s ease, padding .28s ease;
+  }
+  body.bk-knappsats .atm-keypad-section {
+    max-height: 220px;
+    opacity: 1;
+    padding: 9px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .atm-keypad-section, .atm-screen { transition: none; }
+  }
 
   .atm-keypad-section {
     display: flex;
@@ -2013,4 +2067,12 @@ body::before {
 
 @media (prefers-reduced-motion: reduce) {
   .atm-machine::after, .atm-machine::before { animation: none; }
+}
+
+/* Knappsatsknappen hor bara till mobilvyn; pa dator ligger knappsatsen framme jamt.
+   Regeln MASTE vara scopad till datorbredd och inte bara skrivas har nere: en senare
+   regel med samma specificitet vinner over mediafragan langre upp, och da var knappen
+   dold aven pa mobil - dar den ar enda vagen till knappsatsen. */
+@media (min-width: 581px) {
+  .knappsats-knapp { display: none; }
 }

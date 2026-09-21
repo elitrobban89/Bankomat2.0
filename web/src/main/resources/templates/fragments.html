@@ -83,7 +83,15 @@
     <div class="cash-housing"><div class="cash-slit"></div></div>
     <span class="cash-label">Uttagsfack / Cash dispenser</span>
   </div>
-  <div class="atm-keypad-section">
+  <!-- Knappen syns bara pa mobil (se style.css). Den ar en riktig <button> och inte en
+       div: den ska ga att na med tangentbord och skarmlasare, till skillnad fran
+       maskinens dekorativa tangenter. -->
+  <button type="button" class="knappsats-knapp" aria-expanded="false"
+          aria-controls="atm-knappsats" aria-label="Visa knappsats">
+    <span class="knappsats-ikon" aria-hidden="true">⌨</span>
+    <span class="knappsats-text">Knappsats</span>
+  </button>
+  <div class="atm-keypad-section" id="atm-knappsats">
     <div class="keypad-grid">
       <div class="num-key">1</div><div class="num-key">2</div><div class="num-key">3</div>
       <div class="num-key">4</div><div class="num-key">5</div><div class="num-key">6</div>
@@ -473,6 +481,38 @@
         // Textfält (namn, adress, OCR) lämnas orörda och behåller vanligt tangentbord.
         if (window.matchMedia && window.matchMedia('(max-width: 580px)').matches) {
           var NUM_FIELDS = ['belopp', 'kontonr', 'tillKonto', 'saldo', 'postnr'];
+
+          // Knappsatsen fram vid behov. I menylage ar panelen en tunn remsa - det ar
+          // menyerna man scrollar i, och de behover hojden battre an en knappsats man
+          // inte anvander just da.
+          function visaKnappsats(pa) {
+            document.body.classList.toggle('bk-knappsats', pa);
+            var kn = document.querySelector('.knappsats-knapp');
+            if (kn) {
+              kn.setAttribute('aria-expanded', pa ? 'true' : 'false');
+              kn.setAttribute('aria-label', pa ? 'Dölj knappsats' : 'Visa knappsats');
+            }
+          }
+
+          // Fokus i ett sifferfalt ar sjalva signalen "nu ska jag skriva".
+          document.addEventListener('focusin', function (e) {
+            var t = e.target;
+            if (!t || t.tagName !== 'INPUT' || !t.closest('.screen-main')) return;
+            if (NUM_FIELDS.indexOf(t.getAttribute('name')) === -1) return;
+            visaKnappsats(true);
+            // Faltet kan hamna bakom knappsatsen som just gled upp - vanta in
+            // overgangen och rulla fram det.
+            setTimeout(function () {
+              try { t.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (err) {}
+            }, 320);
+          });
+
+          var knappsatsKnapp = document.querySelector('.knappsats-knapp');
+          if (knappsatsKnapp) {
+            knappsatsKnapp.addEventListener('click', function () {
+              visaKnappsats(!document.body.classList.contains('bk-knappsats'));
+            });
+          }
           document.querySelectorAll('.screen-main input[type="text"]').forEach(function (inp) {
             if (NUM_FIELDS.indexOf(inp.getAttribute('name')) !== -1) {
               inp.setAttribute('inputmode', 'none');
