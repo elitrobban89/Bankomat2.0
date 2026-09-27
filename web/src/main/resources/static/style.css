@@ -1688,6 +1688,9 @@ body::before {
   flex-wrap: wrap;
 }
 .card-accept-vanster { display: flex; align-items: center; gap: 9px; }
+/* Kortet ligger redan i lasaren (satt av skriptet i <head> fore forsta bildrutan) - remsan
+   finns inte alls, i stallet for att synas en blixtsekund innan skriptet i botten hinner dolja den. */
+.bk-kort-isatt .card-accept { display: none; }
 /* Kortet ar isatt: remsan tonar ut i stallet for att slockna tvart. */
 .card-accept.kort-in {
   opacity: 0;

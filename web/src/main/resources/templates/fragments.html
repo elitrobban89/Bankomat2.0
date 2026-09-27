@@ -11,6 +11,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" th:href="@{/style.css}"/>
+  <!-- Kortremsan ("Satt in ditt kort" + Visa/Mastercard) ska inte blinka fram vid menybyten.
+       Appen laddar om sidan vid varje val, och remsan doldes forut av skriptet LANGST NER i
+       sidan - efter att webblasaren redan malat den en bildruta. Det har skriptet star i <head>
+       och kor INNAN body ritas: klassen finns pa <html> fran forsta bildrutan, sa CSS:en doljer
+       remsan innan den nagonsin syns. Synkront med flit - defer hade gett tillbaka blinket. -->
+  <script>try{if(sessionStorage.getItem('atmKortIsatt'))document.documentElement.classList.add('bk-kort-isatt')}catch(e){}</script>
   <!-- Uppstartsskarmen. defer: den ska rita over menyn, inte forsena att menyn finns. -->
   <script th:src="@{/splash.js}" defer></script>
 </th:block>
