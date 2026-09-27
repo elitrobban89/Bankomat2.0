@@ -14,7 +14,13 @@ COPY web/src ./src
 RUN ./mvnw clean package -DskipTests
 
 FROM bellsoft/liberica-openjre-alpine:27
+# Liberica levererar INTE JDK:ns CDS-arkiv (lib/server/classes.jsa), sa varje JDK-klass laddas
+# kallt. Pa Renders gratis-CPU ligger starten da nara gransen for portskanningen: 2026-09-27
+# gick en deploy igenom och nasta - med identisk kod, bara README andrad - foll ("failed deploy").
+# Samma fix som BiltUthyrning 2026-09-23 (8498165): -Xshare:dump bygger arkivet en gang har,
+# TieredStopAtLevel=1 (bara C1) kortar starten ytterligare pa en CPU-snal instans.
+RUN java -Xshare:dump
 WORKDIR /app
 COPY --from=build /app/target/bankomat-web-1.0.0.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:TieredStopAtLevel=1", "-jar", "app.jar"]
