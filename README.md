@@ -67,6 +67,8 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 
 Webbversionen är designad som en riktig bankomat, med interaktiv "hårdvara":
 
+**Inget blink vid menybyten** (2026-09-27): kortremsan ("Sätt in ditt kort" + Visa/Mastercard) doldes förut av skriptet längst ner i sidan — efter att webbläsaren redan målat den en bildruta, vid varje menyval eftersom appen laddar om sidan. Ett synkront skript i `<head>` läser nu `sessionStorage` och sätter `bk-kort-isatt` på `<html>` före första bildrutan, och CSS:en döljer remsan innan den någonsin syns.
+
 **Maskinen**
 - **Mörk ATM-kropp** med glödande kortläsare, kvittoskrivare, statuslampa,
   borstad stålknappsats (med taktil punkt på 5:an) och uttagsfack ovanför knappsatsen
