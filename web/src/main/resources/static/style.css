@@ -2010,8 +2010,11 @@ body::before {
   }
   /* En telefon ar hog och smal, maskinen bred och lag - skalad efter bredden fyllde den
      bara halva hojden. Hogre skarm ger en hogre maskin, som tar mer av telefonen utan att
-     en enda proportion i layouten andras (skalan styrs anda av bredden). */
-  .atm-screen { height: 760px; }
+     en enda proportion i layouten andras (skalan styrs anda av bredden).
+     760 px blev dock for avlangt i WP-ramen (88vh), sa hojden RAKNAS nu av
+     anpassaMobilskarm i fragments.html (360-560 px). Vardet har ar bara startlaget
+     innan skriptet hunnit kora - mitt i spannet, sa hoppet blir litet at bada hall. */
+  .atm-screen { height: 480px; }
   /* Knappsatsen ar alltid synlig i en miniatyr, precis som pa dator. */
   .knappsats-knapp { display: none; }
 }

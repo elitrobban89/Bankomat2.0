@@ -133,6 +133,32 @@
       // Höjden är den bindande faktorn i en 950 px hög ram (maskinen är hög och smal, 660:904).
       // Görs ramen högre i WordPress-blocket växer maskinen med den, utan ytterligare ändringar.
       var ATM_MAX_ZOOM = 1.45;
+
+      // Mobilens skärmhöjd RÄKNAS, den är inte längre fast.
+      //
+      // Den stod på 760 px för att maskinen skulle fylla en hel telefon. Men i WP-ramen
+      // (88vh — på en telefon med adressfält ~580 px) blev maskinen då HÖJDBUNDEN: den
+      // krympte i sidled och skärmen blev en lång, mest tom display under tre menyrader
+      // ("för avlång", 2026-09-29). Nu väljs den höjd där maskinen fyller ytan i BÅDA
+      // led samtidigt — bredden sätter skalan, skärmen tar resten av höjden.
+      //
+      // Golvet 360 är menyns eget behov (uppmätt 09-21: 319 px med kortremsan), taket 560
+      // håller skärmen ur det avlånga på en hög telefon utan ram — där får det hellre
+      // bli luft runt maskinen än en display som mest är tom.
+      var MOBIL_SKARM_MIN = 360, MOBIL_SKARM_MAX = 560;
+      function anpassaMobilskarm(m, ytaBredd, ytaHojd) {
+        var skarm = m.querySelector('.atm-screen');
+        if (!skarm) return;
+        if (window.matchMedia && !window.matchMedia('(max-width: 580px)').matches) {
+          skarm.style.height = '';
+          return;
+        }
+        var ovrigt = m.offsetHeight - skarm.offsetHeight;
+        var bredSkala = ytaBredd / m.offsetWidth;
+        var mal = ytaHojd / bredSkala - ovrigt;
+        skarm.style.height = Math.round(Math.max(MOBIL_SKARM_MIN, Math.min(MOBIL_SKARM_MAX, mal))) + 'px';
+      }
+
       function fitAtm() {
         var m = document.querySelector('.atm-machine');
         if (!m) return;
@@ -160,6 +186,7 @@
         // paverkas inte av overspillet.
         var vyBredd = document.documentElement.clientWidth || window.innerWidth;
         var vyHojd  = document.documentElement.clientHeight || window.innerHeight;
+        anpassaMobilskarm(m, vyBredd - luftX, vyHojd - luftY);
         var tillHojd  = (vyHojd - luftY) / m.offsetHeight;
         var tillBredd = (vyBredd - luftX) / m.offsetWidth;
         var skala = Math.min(tillHojd, tillBredd, ATM_MAX_ZOOM);
