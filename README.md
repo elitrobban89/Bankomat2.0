@@ -58,8 +58,8 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 |-----------|-----------|
 | Backend | Spring Boot 3.5.16 |
 | Templating | Thymeleaf |
-| Databas | PostgreSQL |
-| Hosting | Render (Docker) |
+| Databas | PostgreSQL 18 (versionen läses ur anslutningen, se Uppstartsskärm) |
+| Hosting | Render (Docker), autodeploy från `master` |
 | Font | Share Tech Mono (Google Fonts) |
 | Java-version | Java 27 |
 
@@ -89,10 +89,25 @@ Webbversionen är designad som en riktig bankomat, med interaktiv "hårdvara":
 - **Kvitto skrivs ut** ur kvittofacket efter insättning/uttag/överföring och rivs av
 - **Neongrön fosforskärm** med CRT-scanlines, fosformask, rullande refresh-band,
   vinjettering, subtilt flimmer och kromatisk aberration
-- **Matrix-regn** och pulserande glöd bakom maskinen
+- **Väggen bakom maskinen** (2026-09-29) — maskinen står mot en lugn betongvägg med plattskarvar, puts och en lampa ovanför. Över väggen spelar gatans ljus: en rosa neonskylt som andas och ibland flimrar, en turkos skylt och strålkastare från bilar som sveper förbi. Förut stod den i ett svart tomrum med grönt sifferregn; regnet finns kvar som en svag reflex i väggen
 - Saldot räknas upp från 0, meddelanden glitchar in, felsidans text glitchar
 - Alla effekter respekterar `prefers-reduced-motion`
 - **Mobilanpassad** — sidoknappar och knappsats döljs på små skärmar
+
+## Uppstartsskärm
+
+Första besöket per flik visar en **vit, bankmässig** uppstartsskärm (`static/splash.js`) innan menyn. Den var förut svart med fosforgrönt sifferregn och är nu vit med marinblått, guldlinje och gröna bockar, som ett kontoutdrag. Raderna tickar in och bockas av:
+
+| Rad | Visar | Källa |
+|---|---|---|
+| ☕ Java | Java- och Spring Boot-version | den körande JVM:en |
+| 🐘 PostgreSQL | databasens namn och version + JDBC-drivrutin | `DatabaseMetaData` på anslutningen (`Systeminfo`) |
+| 🧩 Teknikstack | Spring MVC · Thymeleaf · JdbcTemplate · Docker på Render | |
+| 📊 Kontoregister | antal konton och kunder | registret |
+| 💰 Förvaltat | summan av saldona i kr | registret |
+| 🏦 · 💵 · 🔐 · 💳 | betaltjänst, sedelkassett, säkerhetsmodul, kortläsare | maskinens egen uppstart |
+
+Foten visar **autodeploy via Render** med branch och commit (`RENDER_GIT_BRANCH`/`RENDER_GIT_COMMIT`). Inget är avskrivet: uppgraderas projektet till Java 28 eller en nyare PostgreSQL visar skärmen det av sig själv. Saknas en siffra visas raden utan den i stället för med en påhittad. CarAdvice nattrutin kontrollerar varje natt att uppgifterna stämmer (`scripts/splash-vakt.js` i CarAdvice). `?splash=1` tvingar fram skärmen.
 
 ## Arkitektur
 
