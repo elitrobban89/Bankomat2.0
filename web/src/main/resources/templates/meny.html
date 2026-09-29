@@ -4,7 +4,7 @@
 <head th:replace="~{fragments :: head('Meny')}"></head>
 <!-- Talen lases av splash.js till kontoraden. th:attr utan varde ger inget attribut alls,
      sa saknas siffrorna visar splashen raden utan dem i stallet for med en nolla. -->
-<body th:attr="data-konton=${antalKonton},data-kunder=${antalKunder},data-db=${databas},data-boot=${springBoot},data-java=${javaVersion}">
+<body th:attr="data-konton=${antalKonton},data-kunder=${antalKunder},data-saldo=${totalSaldo},data-db=${databas},data-jdbc=${jdbc},data-boot=${springBoot},data-java=${javaVersion},data-commit=${deployCommit},data-branch=${deployBranch}">
 <div class="atm-machine">
   <div th:replace="~{fragments :: atm-top}"></div>
   <div class="atm-mid">

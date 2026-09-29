@@ -30,10 +30,8 @@
 
 body {
   min-height: 100vh;
-  background: #020402;
-  background-image:
-    radial-gradient(ellipse 60% 40% at 50% 0%, #061a0c, transparent),
-    radial-gradient(ellipse 40% 30% at 80% 100%, #030d06, transparent);
+  /* Grundtonen bakom väggen (se "VÄGGEN" längre ned) — syns bara om lagren inte hunnit ritas. */
+  background: #3f4349;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -1209,33 +1207,105 @@ details.accordion > summary:hover { background: rgba(0,60,20,.2); }
 }
 
 /* ══════════════════════════════════════════
-   AMBIENT: matrix rain + glow pulse
+   VÄGGEN: maskinen står mot en lugn betongvägg vid gatan
 ══════════════════════════════════════════ */
-/* Sifferregnet tappade synlighet nar maskinen blev bredare (660 -> 760 px) och huset
-   ljusare: falten vid sidorna blev smalare SAMTIDIGT som kontrasten mot bakgrunden
-   minskade. Bade duken och sjalva tecknen ar ljusare nu - det ar tva reglage och bada
-   behovdes, .5 x 0.32 gav knappt 0,16 i faktisk alfa. */
-.matrix-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  opacity: .85;
-  pointer-events: none;
-}
-
+/* Förr stod maskinen i ett svart tomrum med grönt sifferregn. Nu står den där en bankomat
+   faktiskt står: mot en vanlig vägg, med en lampa ovanför och gatans ljus som spelar över
+   putsen. Väggen själv är STILLA — skarvar, puts och lampans ljuskägla är ett statiskt
+   lager. Det som rör sig är ljuset från gatan (.bk-gata, byggs av gatuljus() i
+   fragments.html), och där animeras bara transform och opacity. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse 55% 45% at 50% 38%, rgba(0,255,100,.06), transparent 70%);
-  animation: ambient-pulse 7s ease-in-out infinite;
+  background:
+    /* lampan ovanför maskinen: varmvit kägla som dör ut nedåt */
+    radial-gradient(ellipse 46% 58% at 50% -6%, rgba(255,238,210,.30), rgba(255,238,210,.08) 55%, transparent 75%),
+    /* trottoaren: väggen möter marken längst ned */
+    linear-gradient(180deg, transparent 86%, rgba(0,0,0,.28) 86.2%, rgba(20,22,26,.55) 100%),
+    /* vinjett: hörnen ligger i skugga */
+    radial-gradient(ellipse 85% 80% at 50% 40%, transparent 55%, rgba(10,12,16,.55) 100%),
+    /* skarvar mellan betongplattorna */
+    repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 150px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.13) 0 1px, transparent 1px 300px),
+    /* puts: fin struktur så ytan inte ser platt ut */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #4a4e55 0%, #43474d 60%, #3a3d42 100%);
 }
 
-@keyframes ambient-pulse {
-  0%, 100% { opacity: .45; }
-  50%      { opacity: 1; }
+/* Gatans ljus. Tre källor, alla mjuka och långsamma — väggen ska kännas lugn:
+     · en rosa neonskylt till vänster som andas (och flimrar till ibland, som neon gör),
+     · en turkos skylt till höger,
+     · strålkastarljus från bilar som sveper förbi längs väggen. */
+.bk-gata { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.bk-gata span { position: absolute; display: block; border-radius: 50%; will-change: transform, opacity; }
+.bk-neon-rosa {
+  left: -18vw; top: 8vh; width: 62vw; height: 80vh;
+  background: radial-gradient(closest-side, rgba(255,64,160,.34), rgba(255,64,160,.10) 55%, transparent);
+  mix-blend-mode: screen;
+  animation: bk-neon-rosa 9s ease-in-out infinite;
+}
+.bk-neon-cyan {
+  right: -20vw; top: 22vh; width: 60vw; height: 76vh;
+  background: radial-gradient(closest-side, rgba(0,210,255,.28), rgba(0,210,255,.08) 55%, transparent);
+  mix-blend-mode: screen;
+  animation: bk-neon-cyan 12s ease-in-out infinite;
+}
+.bk-neon-amber {
+  left: 30vw; bottom: -30vh; width: 40vw; height: 50vh;
+  background: radial-gradient(closest-side, rgba(255,170,60,.20), transparent);
+  mix-blend-mode: screen;
+  animation: bk-neon-cyan 15s ease-in-out -4s infinite reverse;
+}
+.bk-billjus {
+  top: 38vh; left: 0; width: 34vw; height: 46vh; border-radius: 40%;
+  background: radial-gradient(closest-side, rgba(235,242,255,.22), rgba(200,220,255,.06) 60%, transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: bk-billjus 11s cubic-bezier(.45,.05,.55,.95) 2s infinite;
+}
+.bk-billjus.b2 {
+  top: 48vh; height: 36vh;
+  background: radial-gradient(closest-side, rgba(255,120,90,.20), transparent);   /* baklyktor */
+  animation-duration: 17s; animation-delay: 7s; animation-direction: reverse;
+}
+@keyframes bk-neon-rosa {
+  0%, 100% { opacity: .75; transform: translate3d(0,0,0) scale(1); }
+  46%      { opacity: 1;   transform: translate3d(2vw,1vh,0) scale(1.05); }
+  /* det korta flimret: en neonskylt som tappar strömmen en bråkdel av en sekund */
+  48%      { opacity: .35; }
+  49%      { opacity: .95; }
+  50.5%    { opacity: .5; }
+  52%      { opacity: 1; }
+}
+@keyframes bk-neon-cyan {
+  0%, 100% { opacity: .6; transform: translate3d(0,0,0) scale(1); }
+  50%      { opacity: 1;  transform: translate3d(-2.5vw,-2vh,0) scale(1.08); }
+}
+@keyframes bk-billjus {
+  0%   { opacity: 0; transform: translate3d(-40vw,0,0) scaleX(.8); }
+  12%  { opacity: 1; }
+  40%  { opacity: .9; }
+  55%  { opacity: 0; transform: translate3d(110vw,0,0) scaleX(1.2); }
+  100% { opacity: 0; transform: translate3d(110vw,0,0) scaleX(1.2); }
+}
+
+/* Sifferregnet ligger kvar, men som en viskning i väggens ljus i stället för huvudsaken:
+   svagt, långsamt och i gatans turkos — mer reflex i putsen än Matrix. */
+.matrix-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: .14;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bk-gata span { animation: none !important; }
+  .bk-billjus { display: none !important; }
 }
 
 /* ══════════════════════════════════════════

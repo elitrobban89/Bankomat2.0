@@ -183,7 +183,20 @@
         screen.appendChild(ov);
       }
 
-      // Matrix-regn bakom maskinen
+      // Gatans ljus mot väggen bakom maskinen (utseendet bor i style.css under "VÄGGEN").
+      // Elementen skapas även med reducerad rörelse: skyltarnas sken står då stilla, men
+      // väggen ska fortfarande ha ljuset från gatan.
+      function gatuljus() {
+        if (document.querySelector('.bk-gata')) return;
+        var g = document.createElement('div');
+        g.className = 'bk-gata';
+        g.setAttribute('aria-hidden', 'true');
+        g.innerHTML = '<span class="bk-neon-rosa"></span><span class="bk-neon-cyan"></span>' +
+          '<span class="bk-neon-amber"></span><span class="bk-billjus"></span><span class="bk-billjus b2"></span>';
+        document.body.insertBefore(g, document.body.firstChild);
+      }
+
+      // Sifferregnet — nedtonat till en svag reflex i väggen (se .matrix-bg i style.css)
       function matrixRain() {
         // Regnet kors aven pa telefon numera: mobilen visar samma maskin som datorn, och
         // da hor bakgrunden till bilden. Forr hade mobilen en egen layout som fyllde hela
@@ -207,14 +220,18 @@
         window.addEventListener('resize', resize);
         setInterval(function () {
           if (document.hidden) return;
-          ctx.fillStyle = 'rgba(2,4,2,0.12)';
+          // Svansarna tonas ut GENOMSKINLIGT (destination-out) i stället för att målas över
+          // med svart — duken ligger ovanpå väggen och hade annars mörkat ned den.
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.fillStyle = 'rgba(0,0,0,0.12)';
           ctx.fillRect(0, 0, cv.width, cv.height);
-          ctx.fillStyle = 'rgba(0,255,127,0.5)';
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.fillStyle = 'rgba(140,235,255,0.6)';
           ctx.font = fs + 'px monospace';
           for (var i = 0; i < drops.length; i++) {
             ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fs, drops[i] * fs);
             if (drops[i] * fs > cv.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i] += 0.5;
+            drops[i] += 0.35;
           }
         }, 66);
       }
@@ -463,6 +480,7 @@
         try { if (sessionStorage.getItem(KORT_NYCKEL)) doljKortremsa(true); } catch (e) {}
         fitAtm();
         crtSetup();
+        gatuljus();
         matrixRain();
         intro();
         // Efter fitAtm(): maskinen skalas med zoom och byter höjd, och rullningen ska sikta

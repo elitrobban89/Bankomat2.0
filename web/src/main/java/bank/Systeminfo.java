@@ -33,6 +33,7 @@ public class Systeminfo {
 
     private final DataSource dataSource;
     private volatile String databas;
+    private volatile String jdbc = "";
     private volatile boolean last;
 
     public Systeminfo(DataSource dataSource) {
@@ -52,9 +53,30 @@ public class Systeminfo {
         return databas;
     }
 
+    /** Kort commit-hash Render byggde ("9a9e5d0") — tom lokalt, där Render inte sätter variabeln. */
+    public String deployCommit() {
+        String c = System.getenv("RENDER_GIT_COMMIT");
+        return c == null || c.isBlank() ? "" : c.substring(0, Math.min(7, c.length()));
+    }
+
+    /** Grenen Render autodeployar från ("master") — tom lokalt. */
+    public String deployBranch() {
+        String b = System.getenv("RENDER_GIT_BRANCH");
+        return b == null ? "" : b;
+    }
+
+    /** T.ex. "JDBC 42.7.7" — drivrutinen appen pratar med databasen genom. Tom när okänd. */
+    public String jdbc() {
+        databas();
+        return jdbc;
+    }
+
     private String lasDatabas() {
         try (Connection c = dataSource.getConnection()) {
             DatabaseMetaData md = c.getMetaData();
+            // Drivrutinen läses i samma tur: "PostgreSQL JDBC Driver 42.7.7" -> "JDBC 42.7.7".
+            String dv = md.getDriverVersion();
+            jdbc = dv == null || dv.isBlank() ? "" : "JDBC " + dv.trim().split("\\s+")[0];
             String namn = md.getDatabaseProductName();
             String ver = md.getDatabaseProductVersion();
             if (namn == null || namn.isBlank()) return "";

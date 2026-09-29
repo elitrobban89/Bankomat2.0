@@ -51,7 +51,13 @@ public class BankController {
     @GetMapping("/")
     public String meny(Model model) {
         try {
-            model.addAttribute("antalKonton", bankService.getAllAccounts().size());
+            java.util.List<KontoInfo> konton = bankService.getAllAccounts();
+            model.addAttribute("antalKonton", konton.size());
+            // Hela kronor räcker på en rad som ska läsas på en halv sekund.
+            model.addAttribute("totalSaldo", Math.round(konton.stream().mapToDouble(KontoInfo::saldo).sum()));
+            model.addAttribute("jdbc", systeminfo.jdbc());
+            model.addAttribute("deployCommit", systeminfo.deployCommit());
+            model.addAttribute("deployBranch", systeminfo.deployBranch());
             model.addAttribute("antalKunder", bankService.getAllPersonNames().size());
             model.addAttribute("databas", systeminfo.databas());
             model.addAttribute("springBoot", systeminfo.springBoot());
