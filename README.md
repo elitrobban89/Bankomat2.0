@@ -56,7 +56,7 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 
 | Komponent | Teknologi |
 |-----------|-----------|
-| Backend | Spring Boot 3.5.16 |
+| Backend | Spring Boot 4.1.1 |
 | Templating | Thymeleaf |
 | Databas | PostgreSQL 18 (versionen läses ur anslutningen, se Uppstartsskärm) |
 | Hosting | Render (Docker), autodeploy från `master` |

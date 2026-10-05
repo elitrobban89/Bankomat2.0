@@ -2,8 +2,8 @@ package bank;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -21,13 +21,13 @@ class BankControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private BankService bankService;
 
     // Startsidan hamtar databasnamn och Spring Boot-version till uppstartsskarmen. Utan den
     // har mocken saknar @WebMvcTest-skivan bonan (den behover en DataSource) och HELA
     // kontexten vagrar starta - fyra prov foll pa ett fel som inte hade med dem att gora.
-    @MockBean
+    @MockitoBean
     private Systeminfo systeminfo;
 
     @Test
