@@ -46,7 +46,7 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 |-----------|-----------|
 | GUI | Java Swing |
 | Databas | SQLite |
-| JDBC-driver | sqlite-jdbc 3.7.15 |
+| JDBC-driver | sqlite-jdbc 3.53.4.0 |
 | Java-version | Java 27 |
 
 > **Java 27 sedan 2026-09-22** (GA 15 september). Provat på riktigt innan det byttes: ren ombyggnad på JDK 27+35, klassfilsversion **71** och gröna tester — varken Mockito eller Byte Buddy behövde röras.
@@ -149,8 +149,8 @@ java -jar min_labb3.jar
 ### Kompilera och kör från källkod
 
 ```bash
-javac -cp "lib/sqlite-jdbc-3.7.15-M1.jar" -d out/production/min_labb3 src/main/java/bank/*.java
-java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.7.15-M1.jar" bank.Meny
+javac -cp "lib/sqlite-jdbc-3.53.4.0.jar" -d out/production/min_labb3 src/main/java/bank/*.java
+java -cp "out/production/min_labb3;lib/sqlite-jdbc-3.53.4.0.jar" bank.Meny
 ```
 
 ### Bygga och testa med Maven
@@ -200,7 +200,7 @@ min_labb3/
 │               ├── BankRepository.java    # Databasåtkomst
 │               └── BankException.java     # Felhantering mellan lagren
 ├── lib/
-│   └── sqlite-jdbc-3.7.15-M1.jar         # SQLite JDBC-driver
+│   └── sqlite-jdbc-3.53.4.0.jar         # SQLite JDBC-driver
 ├── min_labb3.jar                          # Körbar JAR (inkluderar allt)
 ├── werasbetal.sql                         # Databasschema och testdata
 └── README.md
