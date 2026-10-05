@@ -15,7 +15,7 @@ jobs:
       - name: Set up JDK 27
         uses: actions/setup-java@v4
         with:
-          distribution: liberica
+          distribution: temurin
           java-version: '27'
           cache: maven
 
