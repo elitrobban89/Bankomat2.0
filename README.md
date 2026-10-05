@@ -48,6 +48,7 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 | Databas | SQLite |
 | JDBC-driver | sqlite-jdbc 3.53.4.0 |
 | Java-version | Java 27 |
+| Tester | JUnit 6.1.3 + Mockito 5.24.0 |
 
 > **Java 27 sedan 2026-09-22** (GA 15 september). Provat på riktigt innan det byttes: ren ombyggnad på JDK 27+35, klassfilsversion **71** och gröna tester — varken Mockito eller Byte Buddy behövde röras.
 >
@@ -62,6 +63,7 @@ Båda versionerna har samma funktionsuppsättning och ett nästan identiskt serv
 | Hosting | Render (Docker), autodeploy från `master` |
 | Font | Share Tech Mono (Google Fonts) |
 | Java-version | Java 27 |
+| Tester | JUnit 6.0.3 + Mockito 5.23.0 (versionerna styrs av Spring Boot) |
 
 ## Webbdesign
 
@@ -229,7 +231,7 @@ Databasen innehåller Looney Tunes-karaktärer som testdata:
 
 ## Tester
 
-Båda versionerna har egna testsviter — totalt 61 tester (JUnit 5 + Mockito).
+Båda versionerna har egna testsviter — totalt 61 tester (JUnit 6 + Mockito).
 Alla körs automatiskt i CI vid varje push.
 
 **Skrivbordsversionen** (38 tester):
